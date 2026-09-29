@@ -11,6 +11,32 @@ class Grupo {
     private String colorGrupo; //Color del grupo
     private int numCasillas; //Número de casillas del grupo.
 
+    public ArrayList<Casilla> getMiembros() {
+        return miembros;
+    }
+
+    public String getColorGrupo() {
+        return colorGrupo;
+    }
+
+    public int getNumCasillas() {
+        return numCasillas;
+    }
+
+    public void setMiembros(ArrayList<Casilla> miembros) {
+        this.miembros = miembros;
+    }
+
+    public void setColorGrupo(String colorGrupo) {
+        this.colorGrupo = colorGrupo;
+    }
+
+    public void setNumCasillas(int numCasillas) {
+        this.numCasillas = numCasillas;
+    }
+
+
+
     //Constructor vacío.
     public Grupo() {
     }
