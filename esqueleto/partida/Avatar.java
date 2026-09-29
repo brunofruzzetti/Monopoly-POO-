@@ -35,6 +35,7 @@ public class Avatar {
 
     //Constructor vacío
     public Avatar() {
+        
     }
 
     /*Constructor principal. Requiere éstos parámetros:

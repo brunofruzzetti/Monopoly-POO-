@@ -17,6 +17,89 @@ public class Menu {
     private boolean tirado; //Booleano para comprobar si el jugador que tiene el turno ha tirado o no.
     private boolean solvente; //Booleano para comprobar si el jugador que tiene el turno es solvente, es decir, si ha pagado sus deudas.
 
+    public ArrayList<Jugador> getJugadores() {
+        return jugadores;
+    }
+
+    public ArrayList<Avatar> getAvatares() {
+        return avatares;
+    }
+
+    public int getTurno() {
+        return turno;
+    }
+
+    public int getLanzamientos() {
+        return lanzamientos;
+    }
+
+    public Tablero getTablero() {
+        return tablero;
+    }
+
+    public Dado getDado1() {
+        return dado1;
+    }
+
+    public Dado getDado2() {
+        return dado2;
+    }
+
+    public Jugador getBanca() {
+        return banca;
+    }
+
+    public boolean isTirado() {
+        return tirado;
+    }   
+
+    public boolean isSolvente() {
+        return solvente;
+    }
+
+    public void setJugadores(ArrayList<Jugador> jugadores) {
+        this.jugadores = jugadores;
+    }
+
+    public void setAvatares(ArrayList<Avatar> avatares) {
+        this.avatares = avatares;
+    }
+
+    public void setTurno(int turno) {
+        this.turno = turno;
+    }
+
+    public void setLanzamientos(int lanzamientos) {
+        this.lanzamientos = lanzamientos;
+    }
+
+    public void setTablero(Tablero tablero) {
+        this.tablero = tablero;
+    }
+
+    public void setDado1(Dado dado1) {
+        this.dado1 = dado1;
+    }
+
+    public void setDado2(Dado dado2) {
+        this.dado2 = dado2;
+    }
+
+    public void setBanca(Jugador banca) {
+        this.banca = banca;
+    }
+
+    public void setTirado(boolean tirado) {
+        this.tirado = tirado;
+    }
+
+    public void setSolvente(boolean solvente) {
+        this.solvente = solvente;
+    }
+
+    //Constructor vacío.
+    public Menu() {
+    }
 
     // Método para inciar una partida: crea los jugadores y avatares.
     private void iniciarPartida() {
