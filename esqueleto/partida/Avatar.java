@@ -13,6 +13,26 @@ public class Avatar {
     private Jugador jugador; //Un jugador al que pertenece ese avatar.
     private Casilla lugar; //Los avatares se sitúan en casillas del tablero.
 
+    //getters
+    public String getId() {return id; }
+    public String getTipo() { return tipo;}
+    public Jugador getJugador() { return jugador; }
+    public Casilla getLugar() { return lugar; }
+
+    //setters
+    public void setId(String id){
+        this.id = id;
+    }
+    public void setTipo(String tipo){
+        this.tipo = tipo;
+    }
+    public void setJugador(Jugador jugador){
+        this.jugador = jugador;
+    }
+    public void setLugar(Casilla lugar){
+        this.lugar = lugar;
+    }
+
     //Constructor vacío
     public Avatar() {
     }

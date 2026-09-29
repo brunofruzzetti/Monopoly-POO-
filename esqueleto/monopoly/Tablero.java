@@ -26,6 +26,7 @@ public class Tablero {
     
     //Método para insertar las casillas del lado norte.
     private void insertarLadoNorte() {
+        
     }
 
     //Método para insertar las casillas del lado sur.
@@ -43,7 +44,12 @@ public class Tablero {
     //Para imprimir el tablero, modificamos el método toString().
     @Override
     public String toString() {
-        return "smfnw";
+        String tablero = "";
+        ArrayList<Casilla> norte = casilla.get(0);
+        for(int i = 0; i < norte.size(); i++){
+            tablero = tablero + "|" + norte.get(i);
+        }
+        return tablero;
     }
     
     //Método usado para buscar la casilla con el nombre pasado como argumento:

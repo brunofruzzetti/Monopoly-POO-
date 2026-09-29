@@ -17,6 +17,35 @@ public class Jugador {
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
 
+    //getters
+    public String getNombre() { return nombre; }
+    public Avatar getAvatar() { return avatar; }
+    public float getFortuna() { return fortuna; }
+    public float getGastos() { return gastos; }
+    public boolean getEnCarcel() { return enCarcel; }
+    public int getTiradasCarcel() { return tiradasCarcel; }
+    public int getVueltas() { return vueltas;}
+    public ArrayList<Casilla> getPropiedades() { return propiedades; }
+
+    //setters
+    public void setNombre(String nombre){
+        this.nombre = nombre;
+    }
+    public void setAvatar(Avatar avatar){
+        this.avatar = avatar;
+    }
+    public void setFortuna(float fortuna){
+        this.fortuna = fortuna;
+    }
+    public void setGastos(float gastos){
+        this.gastos = gastos;
+    }
+    public void setEnCarcel(boolean enCarcel){
+        this.enCarcel = enCarcel;
+    }
+
+
+
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
     }
