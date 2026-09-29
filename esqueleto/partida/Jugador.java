@@ -43,6 +43,15 @@ public class Jugador {
     public void setEnCarcel(boolean enCarcel){
         this.enCarcel = enCarcel;
     }
+    public void setTiradasCarcel(int tiradasCarcel){
+        this.tiradasCarcel = tiradasCarcel;
+    }
+    public void setVueltas(int vueltas){
+        this.vueltas = vueltas;
+    }
+    public void setPropiedades(ArrayList<Casilla> Propiedades){
+        this.propiedades = propiedades;
+    }
 
 
 
