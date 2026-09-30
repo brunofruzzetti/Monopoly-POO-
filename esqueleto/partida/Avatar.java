@@ -48,7 +48,8 @@ public class Avatar {
         this.lugar = lugar;
         this.generarId(avCreados);
         if (lugar != null){
-            lugar.anhadirAvatar(this)}    
+            lugar.anhadirAvatar(this);
+        }    
 }
 
     //A continuación, tenemos otros métodos útiles para el desarrollo del juego.
@@ -75,13 +76,13 @@ public class Avatar {
             IdGenerado = String.valueOf(letra);
             if (avCreados != null){
                 for (Avatar av : avCreados){
-                    if (av != null && IdGenerado.equals(av.getId()));
+                    if (av != null && IdGenerado.equals(av.getId())){
                         repetido = true; 
                         break;
                 }            
             }    
-        } while(repetido);
-    } 
+        } 
+    } while(repetido); 
     this.id = IdGenerado;
-
+    }
 }
