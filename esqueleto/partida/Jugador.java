@@ -57,6 +57,10 @@ public class Jugador {
 
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
+        nombre = "Banca";
+        fortuna = 0;
+        propiedades = new ArrayList<>();
+        avatar = null;
     }
 
     /*Constructor principal. Requiere parámetros:
@@ -65,6 +69,10 @@ public class Jugador {
     * que dos avatares tengan mismo ID). Desde este constructor también se crea el avatar.
      */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
+        this.nombre = nombre;
+        fortuna = 1500000;
+        propiedades = new ArrayList<>();
+        avatar = new Avatar(tipoAvatar, this, Salida, tablero)
     }
 
     //Otros métodos:

@@ -12,7 +12,7 @@ public class Casilla {
     private float valor; //Valor de esa casilla (en la mayoría será valor de compra, en la casilla parking se usará como el bote).
     private int posicion; //Posición que ocupa la casilla en el tablero (entero entre 1 y 40).
     private Jugador duenho; //Dueño de la casilla (por defecto sería la banca).
-    private Jugador jugadorEnCasilla;
+    private Jugador jugadorEnCasilla; //Detecta si el jugador está en la casilla para añadir el avatar en el nombre de la casilla
     private Grupo grupo; //Grupo al que pertenece la casilla (si es solar).
     private float impuesto; //Cantidad a pagar por caer en la casilla: el alquiler en solares/servicios/transportes o impuestos.
     private float hipoteca; //Valor otorgado por hipotecar una casilla
