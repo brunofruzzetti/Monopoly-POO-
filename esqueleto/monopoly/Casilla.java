@@ -12,6 +12,7 @@ public class Casilla {
     private float valor; //Valor de esa casilla (en la mayoría será valor de compra, en la casilla parking se usará como el bote).
     private int posicion; //Posición que ocupa la casilla en el tablero (entero entre 1 y 40).
     private Jugador duenho; //Dueño de la casilla (por defecto sería la banca).
+    private Jugador jugadorEnCasilla;
     private Grupo grupo; //Grupo al que pertenece la casilla (si es solar).
     private float impuesto; //Cantidad a pagar por caer en la casilla: el alquiler en solares/servicios/transportes o impuestos.
     private float hipoteca; //Valor otorgado por hipotecar una casilla
@@ -92,32 +93,67 @@ public class Casilla {
 
     //Constructores:
     public Casilla() {
+    avatares = new ArrayList<>();
     }//Parámetros vacíos
 
     /*Constructor para casillas tipo Solar, Servicios o Transporte:
     * Parámetros: nombre casilla, tipo (debe ser solar, serv. o transporte), posición en el tablero, valor y dueño.
     */
     public Casilla(String nombre, String tipo, int posicion, float valor, Jugador duenho) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.posicion = posicion;
+        this.valor = valor;
+        this.duenho = duenho;
+        this.hipoteca = valor / 2.0f;
+        this.impuesto = valor * 0.1f;
+        this.avatares = new ArrayList<>();
     }
 
     /*Constructor utilizado para inicializar las casillas de tipo IMPUESTOS.
      * Parámetros: nombre, posición en el tablero, impuesto establecido y dueño.
      */
     public Casilla(String nombre, int posicion, float impuesto, Jugador duenho) {
+        this.nombre = nombre;
+        this.tipo = "Impuesto";
+        this.posicion = posicion;
+        this.impuesto = impuesto;
+        this.duenho = duenho;
+        this.valor = 0;
+        this.hipoteca = 0;
+        this.avatares = new ArrayList<>();
     }
 
     /*Constructor utilizado para crear las otras casillas (Suerte, Caja de comunidad y Especiales):
      * Parámetros: nombre, tipo de la casilla (será uno de los que queda), posición en el tablero y dueño.
      */
     public Casilla(String nombre, String tipo, int posicion, Jugador duenho) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.posicion = posicion;
+        this.duenho = duenho;
+        this.valor = 0;
+        this.impuesto = 0;
+        this.hipoteca = 0;
+        this.avatares = new ArrayList<>();
     }
 
+    public String toString(){
+        if (jugadorEnCasilla==null) return this.nombre;
+        return this.nombre + jugadorEnCasilla.getAvatar().getId();
+}
     //Método utilizado para añadir un avatar al array de avatares en casilla.
     public void anhadirAvatar(Avatar av) {
+        if (av != null && !this.avatares.contains(av)) {
+            this.avatares.add(av);
+        }
     }
 
     //Método utilizado para eliminar un avatar del array de avatares en casilla.
     public void eliminarAvatar(Avatar av) {
+        if (av != null) {
+            this.avatares.remove(av);
+        }
     }
 
     /*Método para evaluar qué hacer en una casilla concreta. Parámetros:
@@ -127,7 +163,7 @@ public class Casilla {
     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
     * en caso de no cumplirlas.*/
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        return false;
+        return true;
     }
 
     /*Método usado para comprar una casilla determinada. Parámetros:
@@ -147,14 +183,14 @@ public class Casilla {
      * - Jugador que solicita la información (para mostrar si es dueño o no de la casilla). 
      * Devuelve una cadena con información específica de cada tipo de casilla.*/
     public String infoCasilla() {
-        return "skdnsfkw";
+        return "Casilla: " + this.nombre + " [Tipo: " + this.tipo + ", Valor: " + this.valor + "]";
     }
 
     /* Método para mostrar información de una casilla en venta.
      * Valor devuelto: texto con esa información.
      */
     public String casEnVenta() {
-        return "tamagochi";
+        return "Casilla en venta: " + this.nombre + " - " + this.valor + " €";
     }
 
 }

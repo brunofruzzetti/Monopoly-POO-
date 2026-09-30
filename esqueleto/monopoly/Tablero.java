@@ -50,7 +50,10 @@ public class Tablero {
     
     //Método para insertar las casillas del lado norte.
     private void insertarLadoNorte() {
-        
+        ArrayList<Casilla> casillasNorte = new ArrayList<>();
+        Casilla parking= new Casilla ("Parking", "Especial",20,0,banca);
+        casillasNorte.add(parking);
+        tablero.add(casillasNorte);
     }
 
     //Método para insertar las casillas del lado sur.
