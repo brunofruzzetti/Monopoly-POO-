@@ -35,8 +35,6 @@ class Grupo {
         this.numCasillas = numCasillas;
     }
 
-
-
     //Constructor vacío.
     public Grupo() {
     }
