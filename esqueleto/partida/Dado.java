@@ -18,10 +18,9 @@ public class Dado {
     public int hacerTirada() {
 
         Random random = new Random();
-        
         // la funcion random.nextInt genera un numero entre 0 y n (excluyendo n)
         int dado = random.nextInt(6) + 1;
-        System.out.println("Salió un: " + dado);
+        this.valor = dado;
         
         return dado;
     }

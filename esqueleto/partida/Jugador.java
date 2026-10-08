@@ -70,9 +70,9 @@ public class Jugador {
      */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
         this.nombre = nombre;
-        fortuna = 1500000;
+        fortuna = Valor.FORTUNA_INICIAL;
         propiedades = new ArrayList<>();
-        avatar = new Avatar(tipoAvatar, this, Salida, avCreados);
+        avatar = new Avatar(tipoAvatar, this, inicio, avCreados);
         if (avCreados != null){
             avCreados.add(this.avatar);
     }

@@ -4,8 +4,14 @@ package monopoly;
 public class Valor {
     //Se incluyen una serie de constantes útiles para no repetir valores.
     public static final float FORTUNA_BANCA = 500000; // Cantidad que tiene inicialmente la Banca
-    public static final float FORTUNA_INICIAL = 9543076.28f; // Cantidad que recibe cada jugador al comenzar la partida
-    public static final float SUMA_VUELTA = 1301328.584f; // Cantidad que recibe un jugador al pasar pos la Salida
+    public static final float FORTUNA_INICIAL = 15000000; // Cantidad que recibe cada jugador al comenzar la partida
+    public static final float SUMA_VUELTA = 2000000; // Cantidad que recibe un jugador al pasar pos la Salida
+    public static final float PRECIO_SALIR_CARCEL = 500000; // Cantidad a pagar para salir de la Cárcel
+    public static final float IMPUESTO = 2000000; // Cantidad a pagar al caer en una casilla de impuestos
+    public static final float PRECIO_TRANSPORTE = 500000; // Precio de compra de una casilla de transporte
+    public static final float PRECIO_SERVICIO = 500000; // Precio de compra de una casilla de servicio
+    public static final float ALQUILER_TRANSPORTE = 250000; // Alquiler de una casilla de transporte
+    public static final float FACTOR_SERVICIO = 50000; // Factor de servicio
     
     //Colores del texto:
     public static final String RESET = "\u001B[0m";
@@ -17,5 +23,13 @@ public class Valor {
     public static final String PURPLE = "\u001B[35m";
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
+    //Colores de 256 tonos para los grupos que no tienen color básico:
+    public static final String MARRON = "\u001B[38;5;130m";
+    public static final String CELESTE = "\u001B[38;5;75m";
+    public static final String ROSA = "\u001B[38;5;201m";
+    public static final String NARANJA = "\u001B[38;5;215m";
+    public static final String MORADO = "\u001B[38;5;97m";
+    //Estilo subrayado (para dibujar las celdas del tablero):
+    public static final String SUBRAYADO = "\u001B[4m";
 
 }
