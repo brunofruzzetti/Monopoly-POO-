@@ -13,7 +13,6 @@ public class Dado {
     public void setValor(int valor){
         this.valor = valor;
     }
-
     //Metodo para simular lanzamiento de un dado: devolverá un valor aleatorio entre 1 y 6.
     public int hacerTirada() {
 
