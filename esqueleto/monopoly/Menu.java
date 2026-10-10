@@ -86,7 +86,7 @@ public class Menu {
 
     //Constructor vacío.
     public Menu() {
-
+        iniciarPartida();
     }
 
     // Método para inciar una partida: crea los jugadores y avatares.
@@ -104,12 +104,16 @@ public class Menu {
 
         System.out.println(tablero);   //imprimir tablero vacio
 
-        Scanner sc = new Scanner(System.in);
-        System.out.print("$> ");
-        while (!terminar && sc.hasNextLine()) {
-            String linea = sc.nextLine().trim();
-            if (!linea.isEmpty()) analizarComando(linea);
-            if (!terminar) System.out.print("$> ");
+        Scanner sc = new Scanner(System.in); //Objeto que lee la entrada de la termina, System.in equivale a stdin en C
+        System.out.print("$> "); 
+        while (!terminar && sc.hasNextLine()) { 
+            String linea = sc.nextLine().trim(); //el metodo .trim() elimina el espacio inicial de un String
+            if (!linea.isEmpty()){
+                analizarComando(linea); //El metodo comandos analizara la entrada del usuario y decidira que ejecutar
+            } 
+            if (!terminar){
+                System.out.print("$> ");
+            }
         }
         sc.close();
     }
@@ -117,7 +121,96 @@ public class Menu {
     * Parámetro: cadena de caracteres (el comando).
     */
     private void analizarComando(String comando) {
+        String[] partes = comando.trim().split("\\s+");
+        do{
+            switch(partes[0].toLowerCase()){
+                /*
+                $> comandos 
+                lanza un archivo con comandos
+                */
+                case "comandos": 
+                    break;
+                /*
+                $> crear jugador Maria pelota
+                crea jugadores
+                */
+                case "crear": 
 
+                    break;
+                /*
+                $> jugador
+                indica el jugador que tiene el turno
+                */
+                case "jugador": 
+
+                    break;
+                /*
+                $> listar jugadores
+                lista los jugadores que juegan
+                $> listar enventa
+                lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
+                */
+                case "listar": 
+
+                    break;
+                /*
+                $> lanzar dados
+                lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
+                $> lanzar dados 2+4
+                los dos dados tienen un valor frozoso moviendo al jugador esas posiciones (se repinta el tablero)
+                */
+                case "lanzar": 
+                
+                    break;
+                /*
+                $> acabar turno
+                el jugador actual decide que su turno ha acabado y el turno pasa al siguiente
+                */
+                case "acabar":
+
+                    break;
+                /*
+                $> salir cárcel
+                el jugador sale de la carcel pagando si esta en ella
+                */
+                case "salir":
+
+                    break;
+                /*
+                $> describir Solar8
+                se indicaran todas las caracteristicas de una casilla
+                $> describir Maria
+                se indacaran todas las caracteristicas de un jugador
+                */
+                case "describir":
+
+                    break;
+                /*
+                $> comprar Mostoles/Solar12
+                el jugador compra la casilla por su nombre o numero de solar
+                */
+                case "comprar":
+
+                    break;
+                /*
+                $> ver tablero
+                se muestra el tablero en pantalla
+                */
+                case "ver":
+
+                    break;
+                /*
+                $> exit
+                acabar la partida
+                */
+                case "exit":
+                    terminar = true;
+                    break;
+                default:    
+                    System.out.println("Caso incorrecto");
+                    break;
+            }
+        } while(!terminar);
     }
 
     /*Método que realiza las acciones asociadas al comando 'describir jugador'.
