@@ -75,7 +75,7 @@ public class Jugador {
         avatar = new Avatar(tipoAvatar, this, inicio, avCreados);
         if (avCreados != null){
             avCreados.add(this.avatar);
-    }
+        }
     }
 
     //Otros métodos:

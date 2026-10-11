@@ -1,7 +1,10 @@
 package monopoly;
 
+import monopoly.*;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 
 import partida.*;
 
@@ -120,97 +123,128 @@ public class Menu {
     /*Método que interpreta el comando introducido y toma la accion correspondiente.
     * Parámetro: cadena de caracteres (el comando).
     */
-    private void analizarComando(String comando) {
+        private void analizarComando(String comando){
         String[] partes = comando.trim().split("\\s+");
-        do{
-            switch(partes[0].toLowerCase()){
-                /*
-                $> comandos 
-                lanza un archivo con comandos
-                */
-                case "comandos": 
+        switch (normalizar(partes[0])){
+            case "comandos":
+                break;
+            /*
+            $> comandos 
+            lanza un archivo con comandos
+            */
+            case "crear": {
+                //comprobaciones 
+                if(partes.length != 4 || !partes[1].equalsIgnoreCase("jugador")){
+                    System.out.println("Argumentos incorrectos, uso: $> crear jugador nombreJugador tipoAvatar");
                     break;
-                /*
-                $> crear jugador Maria pelota
-                crea jugadores
-                */
-                case "crear": 
+                } //comprobacion argumentos
+                if(jugadores.size() >= 4){
+                    System.out.println("Ya hay 4 jugadores registrados");
+                    break;
+                } //comprobacion sobre cuantos jugadores hay registrados
+                if(!partes[3].equalsIgnoreCase("coche") && !partes[3].equalsIgnoreCase("esfinge") //comprobacion del tipo de avatar
+                        && !partes[3].equalsIgnoreCase("sombrero") && !partes[3].equalsIgnoreCase("pelota")){
+                    System.out.println("El avatar introducido no es valido. Avatares validos: coche, esfinge, sombrero, pelota");
+                    break;
+                }
+                boolean nombreRepetido = false, avatarRepetido = false;
+                for(Jugador a : jugadores){
+                    if(a.getNombre().equalsIgnoreCase(partes[2])) nombreRepetido = true;
+                    if(a.getAvatar().getTipo().equalsIgnoreCase(partes[3])) avatarRepetido = true;
+                }
+                if(nombreRepetido){ //comprobacion del nombre en uso
+                    System.out.println("Nombre ya en uso.");
+                    break;
+                }
+                if(avatarRepetido){ //comprobacion del avatar en uso
+                    System.out.println("Avatar ya en uso.");
+                    break;
+                }
 
-                    break;
-                /*
-                $> jugador
-                indica el jugador que tiene el turno
-                */
-                case "jugador": 
-
-                    break;
-                /*
-                $> listar jugadores
-                lista los jugadores que juegan
-                $> listar enventa
-                lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
-                */
-                case "listar": 
-
-                    break;
-                /*
-                $> lanzar dados
-                lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
-                $> lanzar dados 2+4
-                los dos dados tienen un valor frozoso moviendo al jugador esas posiciones (se repinta el tablero)
-                */
-                case "lanzar": 
-                
-                    break;
-                /*
-                $> acabar turno
-                el jugador actual decide que su turno ha acabado y el turno pasa al siguiente
-                */
-                case "acabar":
-
-                    break;
-                /*
-                $> salir cárcel
-                el jugador sale de la carcel pagando si esta en ella
-                */
-                case "salir":
-
-                    break;
-                /*
-                $> describir Solar8
-                se indicaran todas las caracteristicas de una casilla
-                $> describir Maria
-                se indacaran todas las caracteristicas de un jugador
-                */
-                case "describir":
-
-                    break;
-                /*
-                $> comprar Mostoles/Solar12
-                el jugador compra la casilla por su nombre o numero de solar
-                */
-                case "comprar":
-
-                    break;
-                /*
-                $> ver tablero
-                se muestra el tablero en pantalla
-                */
-                case "ver":
-
-                    break;
-                /*
-                $> exit
-                acabar la partida
-                */
-                case "exit":
-                    terminar = true;
-                    break;
-                default:    
-                    System.out.println("Caso incorrecto");
-                    break;
+                //crear jugador y añadirlo
+                Jugador j = new Jugador(partes[2], partes[3], tablero.encontrar_casilla("salida"), avatares);
+                jugadores.add(j);
+                System.out.println(j);
+                System.out.println(tablero);
+                break;
             }
-        } while(!terminar);
+            /*
+            $> crear jugador Maria pelota
+            crea jugadores
+            */
+            case "jugador":
+
+                break;
+            /*
+            $> jugador
+            indica el jugador que tiene el turno
+            */
+            case "listar":
+
+                break;
+            /*
+            $> listar jugadores
+            lista los jugadores que juegan
+            $> listar enventa
+            lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
+            */
+            case "lanzar":
+
+                break;
+            /*
+            $> lanzar dados
+            lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
+            $> lanzar dados 2+4
+            los dos dados tienen un valor frozoso moviendo al jugador esas posiciones (se repinta el tablero)
+            */
+            case "acabar":
+
+                break;
+            /*
+            $> acabar turno
+            el jugador actual decide que su turno ha acabado y el turno pasa al siguiente
+            */
+            case "salir":
+
+                break;
+            /*
+            $> salir cárcel
+            el jugador sale de la carcel pagando si esta en ella
+            */
+            case "describir":
+
+                break;
+            /*
+            $> describir Solar8
+            se indicaran todas las caracteristicas de una casilla
+            $> describir Maria
+            se indacaran todas las caracteristicas de un jugador
+            */
+            case "comprar":
+
+                break;
+            /*
+            $> comprar Mostoles/Solar12
+            el jugador compra la casilla por su nombre o numero de solar
+            */
+            case "ver":
+
+                break;
+            /*
+            $> ver tablero
+            se muestra el tablero en pantalla
+            */
+            case "exit":
+                terminar = true;
+                break;
+            /*
+            $> exit
+            acabar la partida
+            */
+            default:
+                System.out.println("Caso incorrecto");
+                break;
+        }
     }
 
     /*Método que realiza las acciones asociadas al comando 'describir jugador'.
@@ -269,6 +303,10 @@ public class Menu {
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     private void acabarTurno() {
 
+    }
+
+    private static String normalizar(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
     }
 
 }
