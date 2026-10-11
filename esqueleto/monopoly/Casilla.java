@@ -242,9 +242,66 @@ public class Casilla {
     * - El valor de la tirada: para determinar impuesto a pagar en casillas de servicios.
     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
     * en caso de no cumplirlas.*/
-    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
+    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada, Casilla parking) {
+        // 1. Casillas comprables (Solar, Transporte, Servicios)
+        if (esComprable()) {
+            // Si la casilla tiene dueño, y no es la banca ni el propio jugador
+            if (this.duenho != null && this.duenho != banca && this.duenho != actual) {
+                float aPagar = 0;
+
+                if (this.tipo.equalsIgnoreCase("Solar")) {
+                    aPagar = this.impuesto;
+                } else if (this.tipo.equalsIgnoreCase("Transporte")) {
+                    aPagar = this.impuesto;
+                } else if (this.tipo.equalsIgnoreCase("Servicios")) {
+                    aPagar = 4 * tirada * Valor.FACTOR_SERVICIO;
+                }
+
+                // Comprobar solvencia
+                if (actual.getFortuna() < aPagar) {
+                    System.out.println(actual.getNombre() + " no tiene dinero suficiente para pagar el alquiler de " + formato(aPagar) + "€.");
+                    return false;
+                }
+
+                actual.sumarGastos(aPagar);
+                this.duenho.sumarFortuna(aPagar);
+                System.out.println("Se han pagado " + formato(aPagar) + "€ de alquiler a " + this.duenho.getNombre() + ".");
+                return true;
+            }
+            return true;
+        }
+        // 2. Casillas de Impuestos
+        if (this.tipo.equalsIgnoreCase("Impuesto")) {
+            float tasa = this.impuesto;
+            if (actual.getFortuna() < tasa) {
+                System.out.println(actual.getNombre() + " no tiene dinero suficiente para pagar el impuesto de " + formato(tasa) + "€.");
+                return false;
+            }
+            actual.sumarGastos(tasa);
+            if (parking != null) {
+                parking.sumarValor(tasa);
+            }
+            System.out.println("El jugador paga " + formato(tasa) + "€ que se depositan en el Parking.");
+            return true;
+        }
+        // 3. Casilla Parking
+        if (this.nombre.equalsIgnoreCase("Parking")) {
+            float bote = this.valor;
+            if (bote > 0) {
+                actual.sumarFortuna(bote);
+                this.valor = 0; // Se vacía el bote tras entregarlo
+                System.out.println("El jugador " + actual.getNombre() + " recibe " + formato(bote) + "€.");
+            } else {
+                System.out.println("El Parking no tiene bote acumulado actualmente.");
+            }
+            return true;
+        }
+        // 4. Suerte, Caja de Comunidad, Salida o Cárcel de visita
         return true;
-    }
+    }  
+
+    
+
 
     /*Método usado para comprar una casilla determinada. Parámetros:
      * - Jugador que solicita la compra de la casilla.
