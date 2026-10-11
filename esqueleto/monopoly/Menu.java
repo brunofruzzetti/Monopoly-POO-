@@ -175,6 +175,7 @@ public class Menu {
             case "jugador":
                 if(jugadores.size() == 0){
                     System.out.println("No hay jugadores registrados");
+                    break;
                 }
                 System.out.println(jugadores.get(turno));
                 break;
@@ -184,20 +185,8 @@ public class Menu {
             */
             case "listar":
                 switch (normalizar(partes[1])){
-                    case "jugadores":
-                        if(jugadores.size() == 0){
-                            System.out.println("No hay jugadores registrados");
-                            break;
-                        }
-                        for (Jugador a : jugadores){
-                            System.out.println(a);
-                        }
-                        break;
-                    case "enventa":
-                        for(Casilla c : banca.getPropiedades()){
-                            System.out.println(c.infoCasilla());
-                        }
-                        break;
+                    case "jugadores": listarJugadores(); break;
+                    case "enventa": listarVenta(); break;
                 }
                 break;
             /*
@@ -287,7 +276,65 @@ public class Menu {
     }
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'lanzar dados'.
-    private void lanzarDados() {
+    private void lanzarDados() { //de forma aleatoria
+        int d1 = dado1.hacerTirada();
+        int d2 = dado2.hacerTirada();
+        lanzarDados(d1, d2);
+    }
+    private void lanzarDados(int d1, int d2){ //de forma forzosa
+        //comprobaciones
+        if(jugadores.size() < 2){
+            System.out.println("Se necesitan al menos 2 jugadores para jugar");
+            return;
+        }
+        if(tirado){
+            System.out.println("El jugador ya ha tirado los dados");
+            return;
+        }
+        if(!solvente){
+            System.out.println("El jugador tiene deudas pendientes, no puede lanzar los dados");
+            return;
+        }
+        tirado = true;
+        //el jugador esta en la carcel
+        Jugador jugadorActual = jugadores.get(turno);
+        if(jugadorActual.getEnCarcel()){
+            if(d1 == d2){
+                //el jugador saca dobles y sale de la carcel
+                jugadorActual.setEnCarcel(false);
+                jugadorActual.setTiradasCarcel(0);
+                System.out.println(jugadorActual.getNombre() + " saca dobles y sale de la carcel");
+            }
+            else{
+                //el jugador no saca dobles y sigue en la carcel o completo su tercera tirada y paga para salir de la carcel
+                jugadorActual.setTiradasCarcel(jugadorActual.getTiradasCarcel() + 1);
+                if(jugadorActual.getTiradasCarcel() == 4){
+                    salirCarcel();
+                    return;
+                }
+            }
+        }
+        //el jugador no esta en la carcel
+        else{
+            //el jugador ha sacado dobles
+            if(d1 == d2){
+                lanzamientos++;
+                //son sus terceros dobles consecutivos, el jugador es encarcelado
+                if(lanzamientos == 3){
+                    jugadorActual.encarcelar(tablero.getPosiciones());
+                    return;
+                }
+                //no son sus terceros dobles consecutivos
+                else{
+                    tirado = false;
+                }
+            }
+        }
+        //se mueve el jugador las posiciones de los dados
+        jugadorActual.getAvatar().moverAvatar(tablero.getPosiciones(), d1 + d2);
+        
+        
+
 
     }
 
@@ -298,19 +345,28 @@ public class Menu {
 
     }
 
-    //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel'. 
+    //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
     private void salirCarcel() {
 
     }
 
     // Método que realiza las acciones asociadas al comando 'listar enventa'.
     private void listarVenta() {
+        for(Casilla c : banca.getPropiedades()){
+            System.out.println(c.infoCasilla());
+        }
 
     }
 
     // Método que realiza las acciones asociadas al comando 'listar jugadores'.
     private void listarJugadores() {
-
+        if(jugadores.size() == 0){
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+        for (Jugador a : jugadores){
+            System.out.println(a);
+        }
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
