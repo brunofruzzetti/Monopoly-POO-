@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package monopoly;
 
 import partida.*;
@@ -240,3 +241,98 @@ public class Tablero {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
     }
 }
+=======
+package monopoly;
+
+import partida.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+
+public class Tablero {
+    //Atributos.
+    private ArrayList<ArrayList<Casilla>> posiciones; //Posiciones del tablero: se define como un arraylist de arraylists de casillas (uno por cada lado del tablero).
+    private HashMap<String, Grupo> grupos; //Grupos del tablero, almacenados como un HashMap con clave String (será el color del grupo).
+    private Jugador banca; //Un jugador que será la banca.
+
+    public ArrayList<ArrayList<Casilla>> getPosiciones() {
+        return posiciones;
+    }
+
+    public HashMap<String, Grupo> getGrupos() {
+        return grupos;
+    }
+
+    public Jugador getBanca() {
+        return banca;
+    }
+
+    public void setPosiciones(ArrayList<ArrayList<Casilla>> posiciones) {
+        this.posiciones = posiciones;
+    }
+
+    public void setGrupos(HashMap<String, Grupo> grupos) {
+        this.grupos = grupos;
+    }
+
+    public void setBanca(Jugador banca) {
+        this.banca = banca;
+    }
+
+    //Constructor: únicamente le pasamos el jugador banca (que se creará desde el menú).
+    public Tablero(Jugador banca) {
+        this.banca = banca;
+        this.posiciones = new ArrayList<>();
+        this.grupos = new HashMap<>();
+        this.generarCasillas();
+    }
+
+    
+    //Método para crear todas las casillas del tablero. Formado a su vez por cuatro métodos (1/lado).
+    private void generarCasillas() {
+        this.insertarLadoSur();
+        this.insertarLadoOeste();
+        this.insertarLadoNorte();
+        this.insertarLadoEste();
+    }
+    
+    //Método para insertar las casillas del lado norte.
+    private void insertarLadoNorte() {
+        ArrayList<Casilla> casillasNorte = new ArrayList<>();
+        Casilla parking= new Casilla ("Parking", "Especial",20,0,banca);
+        
+       
+    }
+
+    //Método para insertar las casillas del lado sur.
+    private void insertarLadoSur() {
+        ArrayList<Casilla> casillasSur = new ArrayList<>();
+    }
+
+    //Método que inserta casillas del lado oeste.
+    private void insertarLadoOeste() {
+        ArrayList<Casilla> casillasOeste = new ArrayList<>();
+    }
+
+    //Método que inserta las casillas del lado este.
+    private void insertarLadoEste() {
+        ArrayList<Casilla> casillasEste = new ArrayList<>();
+    }
+
+    //Para imprimir el tablero, modificamos el método toString().
+    @Override
+    public String toString() {
+        String tablero = "";
+        ArrayList<Casilla> norte = casillas.get(0);
+        for(int i = 0; i < norte.size(); i++){
+            tablero = tablero + "|" + norte.get(i);
+        }
+        return tablero;
+    }
+    
+    //Método usado para buscar la casilla con el nombre pasado como argumento:
+    /*public Casilla encontrar_casilla(String nombre){
+    }
+    */
+}
+>>>>>>> 9dd6290 (Creo los arrays de los lados del tablero)
