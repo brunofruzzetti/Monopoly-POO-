@@ -58,7 +58,7 @@ public class Jugador {
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
         nombre = "Banca";
-        fortuna = 0;
+        fortuna = Valor.FORTUNA_BANCA;
         propiedades = new ArrayList<>();
         avatar = null;
     }
@@ -110,6 +110,37 @@ public class Jugador {
     /*Método para establecer al jugador en la cárcel. 
     * Se requiere disponer de las casillas del tablero para ello (por eso se pasan como parámetro).*/
     public void encarcelar(ArrayList<ArrayList<Casilla>> pos) {
-    }
+        this.enCarcel = false;
+        this.tiradasCarcel = 0;
+        // La Cárcel es la primera casilla del lado oeste (índice 1, posición 0)
+        // La Cárcel es la posición 11 (índice 0 del lado Oeste: pos.get(1).get(0))
+        Casilla carcel = pos.get(1).get(0);
 
+        if (this.avatar != null) {
+            if (this.avatar.getLugar() != null) {
+                this.avatar.getLugar().eliminarAvatar(this.avatar);
+            }
+            this.avatar.setLugar(carcel);
+            carcel.anhadirAvatar(this.avatar);
+        }
+    }
+    public boolean puedePagar(float cantidad) {
+    return this.fortuna >= cantidad;
+}
+    @Override
+    public String toString() {
+        String idAvatar;
+        if (this.avatar != null) {
+            idAvatar = this.avatar.getId();
+        } else {
+            idAvatar = "null";
+        }
+
+        String salida = "{\n";
+        salida =  salida + "  nombre: " + this.nombre + ",\n";
+        salida =  salida + "  avatar: " + idAvatar + "\n";
+        salida =  salida + "}";
+
+        return salida;
+    }
 }

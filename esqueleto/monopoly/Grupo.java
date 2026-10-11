@@ -4,7 +4,7 @@ import partida.*;
 import java.util.ArrayList;
 
 
-class Grupo {
+public class Grupo {
 
     //Atributos
     private ArrayList<Casilla> miembros; //Casillas miembros del grupo.
@@ -94,6 +94,9 @@ class Grupo {
     }
 
     public boolean esDuenhoGrupo(Jugador jugador) {
+        if (jugador == null || miembros == null || miembros.isEmpty()) {
+        return false;
+    }
         for (Casilla c : miembros) {
             if (c.getDuenho() != jugador) {
                 return false;
