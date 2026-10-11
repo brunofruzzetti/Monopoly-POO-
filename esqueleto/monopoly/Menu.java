@@ -1,6 +1,6 @@
 package monopoly;
 
-import monopoly.*;
+
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -132,7 +132,7 @@ public class Menu {
             $> comandos 
             lanza un archivo con comandos
             */
-            case "crear": {
+            case "crear":{
                 //comprobaciones 
                 if(partes.length != 4 || !partes[1].equalsIgnoreCase("jugador")){
                     System.out.println("Argumentos incorrectos, uso: $> crear jugador nombreJugador tipoAvatar");
@@ -173,14 +173,32 @@ public class Menu {
             crea jugadores
             */
             case "jugador":
-
+                if(jugadores.size() == 0){
+                    System.out.println("No hay jugadores registrados");
+                }
+                System.out.println(jugadores.get(turno));
                 break;
             /*
             $> jugador
             indica el jugador que tiene el turno
             */
             case "listar":
-
+                switch (normalizar(partes[1])){
+                    case "jugadores":
+                        if(jugadores.size() == 0){
+                            System.out.println("No hay jugadores registrados");
+                            break;
+                        }
+                        for (Jugador a : jugadores){
+                            System.out.println(a);
+                        }
+                        break;
+                    case "enventa":
+                        for(Casilla c : banca.getPropiedades()){
+                            System.out.println(c.infoCasilla());
+                        }
+                        break;
+                }
                 break;
             /*
             $> listar jugadores
