@@ -125,7 +125,7 @@ public class Menu {
     */
         private void analizarComando(String comando){
         String[] partes = comando.trim().split("\\s+");
-        switch (normalizar(partes[0])){
+        switch(normalizar(partes[0])){
             case "comandos":
                 break;
             /*
@@ -184,7 +184,7 @@ public class Menu {
             indica el jugador que tiene el turno
             */
             case "listar":
-                switch (normalizar(partes[1])){
+                switch(normalizar(partes[1])){
                     case "jugadores": listarJugadores(); break;
                     case "enventa": listarVenta(); break;
                 }
@@ -195,9 +195,33 @@ public class Menu {
             $> listar enventa
             lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
             */
-            case "lanzar":
-
+            case "lanzar":{
+                if(partes.length < 2 || partes.length > 3 || !partes[1].equalsIgnoreCase("dados")){
+                    System.out.println("Error en el formato. Formato: lanzar dados [2+4]");
+                    break;
+                }
+                if(partes.length == 2){
+                    lanzarDados();
+                    break;
+                }
+                String[] v = partes[2].split("\\+");
+                if(v.length != 2){
+                    System.out.println("Error en el formato. Formato: lanzar dados 2+4");
+                    break;
+                }
+                try{
+                    int d1 = Integer.parseInt(v[0]);
+                    int d2 = Integer.parseInt(v[1]);
+                    if(d1 < 1 || d1 > 6 || d2 < 1 || d2 > 6){
+                        System.out.println("El valor de cada dado debe estar entre 1 y 6.");
+                        break;
+                    }
+                    lanzarDados(d1, d2);
+                }catch(NumberFormatException e){
+                    System.out.println("Error en el formato. Los dados deben ser números: lanzar dados 2+4");
+                }
                 break;
+            }
             /*
             $> lanzar dados
             lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
@@ -235,7 +259,7 @@ public class Menu {
             el jugador compra la casilla por su nombre o numero de solar
             */
             case "ver":
-
+                System.out.println(tablero);
                 break;
             /*
             $> ver tablero
@@ -287,17 +311,17 @@ public class Menu {
             System.out.println("Se necesitan al menos 2 jugadores para jugar");
             return;
         }
+        Jugador jugadorActual = jugadores.get(turno);
         if(tirado){
-            System.out.println("El jugador ya ha tirado los dados");
+            System.out.println(jugadorActual.getNombre() + " ya ha tirado los dados");
             return;
         }
         if(!solvente){
-            System.out.println("El jugador tiene deudas pendientes, no puede lanzar los dados");
+            System.out.println(jugadorActual.getNombre() + " tiene deudas pendientes, no puede lanzar los dados");
             return;
         }
         tirado = true;
         //el jugador esta en la carcel
-        Jugador jugadorActual = jugadores.get(turno);
         if(jugadorActual.getEnCarcel()){
             if(d1 == d2){
                 //el jugador saca dobles y sale de la carcel
@@ -308,8 +332,19 @@ public class Menu {
             else{
                 //el jugador no saca dobles y sigue en la carcel o completo su tercera tirada y paga para salir de la carcel
                 jugadorActual.setTiradasCarcel(jugadorActual.getTiradasCarcel() + 1);
-                if(jugadorActual.getTiradasCarcel() == 4){
-                    salirCarcel();
+                if(jugadorActual.getTiradasCarcel() == 3){
+                    if(jugadorActual.getFortuna() < Valor.PRECIO_SALIR_CARCEL){
+                        solvente = false; //debe declarse en bancarota no implementado
+                        System.out.println(jugadorActual.getNombre() + " no puede pagar y debe declararse en bancarrota.");
+                        return;
+                    }
+                    jugadorActual.sumarGastos(Valor.PRECIO_SALIR_CARCEL);
+                    jugadorActual.setEnCarcel(false);
+                    jugadorActual.setTiradasCarcel(0);
+                    System.out.println(jugadorActual.getNombre() + " paga 500.000€ y sale de la carcel.");
+                }
+                else{
+                    System.out.println(jugadorActual.getNombre() + " sigue en la carcel.");
                     return;
                 }
             }
@@ -322,6 +357,9 @@ public class Menu {
                 //son sus terceros dobles consecutivos, el jugador es encarcelado
                 if(lanzamientos == 3){
                     jugadorActual.encarcelar(tablero.getPosiciones());
+                    lanzamientos = 0;
+                    System.out.println(jugadorActual.getNombre() + " saca dobles por tercera vez y va a la carcel.");
+                    System.out.println(tablero);
                     return;
                 }
                 //no son sus terceros dobles consecutivos
@@ -329,13 +367,25 @@ public class Menu {
                     tirado = false;
                 }
             }
+            //el jugador no ha sacado dobles
+            else{
+                lanzamientos = 0;
+            }
         }
-        //se mueve el jugador las posiciones de los dados
-        jugadorActual.getAvatar().moverAvatar(tablero.getPosiciones(), d1 + d2);
-        //el jugador al caer en la casilla no puede pagar es decir no es solvente
-        
-        
+        jugadorActual.getAvatar().moverAvatar(tablero.getPosiciones(), d1 + d2); //se mueve el jugador las posiciones de los dados
+        Casilla destino = jugadorActual.getAvatar().getLugar();
+        solvente = destino.evaluarCasilla(jugadorActual, banca, d1 + d2); //evaluar la casilla de destino
+        if(!solvente){
+            System.out.println(jugadorActual.getNombre() + " debe hipotecar alguna propiedad o declararse en bancarrota.");
+        }
+        if(destino.getNombre().equalsIgnoreCase("IrCarcel")){ //cae en la casilla IrCarcel
+            jugadorActual.encarcelar(tablero.getPosiciones());
+            tirado = true;
+            lanzamientos = 0;
+            System.out.println(jugadorActual.getNombre() + " se coloca en la casilla de carcel");
+        }
 
+        System.out.println(tablero); //se repinta el tablero
 
     }
 
