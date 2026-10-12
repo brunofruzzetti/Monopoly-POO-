@@ -43,11 +43,15 @@ public class Tablero {
         this.grupos = new HashMap<>();
         this.generarCasillas();
         this.generarGrupos();
-        //Al principio, la banca es dueña de todas las propiedades.
+        //Al principio, la banca es dueña de todas las propiedades. Añadimos a las casillas de tipo impuesto, la casilla parking
+        Casilla parking = encontrar_casilla("Parking");
         for (ArrayList<Casilla> lado : posiciones) {
             for (Casilla c : lado) {
                 if (c.esComprable()) {
                     banca.anhadirPropiedad(c);
+                }
+                if(c.getTipo().equalsIgnoreCase("impuesto")){
+                    c.setParking(parking);
                 }
             }
         }

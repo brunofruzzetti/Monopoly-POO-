@@ -16,6 +16,7 @@ public class Casilla {
     private float impuesto; //Cantidad a pagar por caer en la casilla: el alquiler en solares/servicios/transportes o impuestos.
     private float hipoteca; //Valor otorgado por hipotecar una casilla
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
+    private Casilla parking; //referencia para acceder a parking
 
     //Precios y alquileres de los edificios de un solar (Apéndice I).
     private float precioCasa;
@@ -131,6 +132,10 @@ public class Casilla {
         this.avatares = avatares;
     }
 
+    public void setParking(Casilla parking){
+        this.parking = parking;
+    }
+
     /*Método para establecer los datos de un solar según el Apéndice I. Parámetros:
      * hipoteca, alquiler, precios de casa, hotel, piscina y pista de deporte, y
      * alquileres de casa, hotel, piscina y pista de deporte.
@@ -242,7 +247,7 @@ public class Casilla {
     * - El valor de la tirada: para determinar impuesto a pagar en casillas de servicios.
     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
     * en caso de no cumplirlas.*/
-    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada, Casilla parking) {
+    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         // 1. Casillas comprables (Solar, Transporte, Servicios)
         if (esComprable()) {
             // Si la casilla tiene dueño, y no es la banca ni el propio jugador

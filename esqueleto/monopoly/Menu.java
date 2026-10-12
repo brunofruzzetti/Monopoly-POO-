@@ -332,6 +332,7 @@ public class Menu {
         }
         //se mueve el jugador las posiciones de los dados
         jugadorActual.getAvatar().moverAvatar(tablero.getPosiciones(), d1 + d2);
+        //el jugador al caer en la casilla no puede pagar es decir no es solvente
         
         
 
