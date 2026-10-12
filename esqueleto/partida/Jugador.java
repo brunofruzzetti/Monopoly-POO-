@@ -125,8 +125,13 @@ public class Jugador {
         }
     }
     public boolean puedePagar(float cantidad) {
-    return this.fortuna >= cantidad;
-}
+        return this.fortuna >= cantidad;
+    }
+
+    public String infoJugador(){
+        String salida = "";
+        return salida;
+    }
     @Override
     public String toString() {
         String idAvatar;

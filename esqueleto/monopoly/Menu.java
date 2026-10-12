@@ -127,6 +127,7 @@ public class Menu {
         String[] partes = comando.trim().split("\\s+");
         switch(normalizar(partes[0])){
             case "comandos":
+                
                 break;
             /*
             $> comandos 
@@ -188,7 +189,7 @@ public class Menu {
                     case "jugadores": listarJugadores(); break;
                     case "enventa": listarVenta(); break;
                 }
-                break;
+                
             /*
             $> listar jugadores
             lista los jugadores que juegan
@@ -229,33 +230,69 @@ public class Menu {
             los dos dados tienen un valor frozoso moviendo al jugador esas posiciones (se repinta el tablero)
             */
             case "acabar":
-
+                if (partes.length != 2 || !partes[1].equalsIgnoreCase("turno")) {
+                    System.out.println("Argumentos incorrectos, uso: $> acabar turno");
+                    break;
+                }
+                acabarTurno();
                 break;
             /*
             $> acabar turno
             el jugador actual decide que su turno ha acabado y el turno pasa al siguiente
             */
             case "salir":
-
+                if(!normalizar(partes[1]).equalsIgnoreCase("carcel") || partes.length != 2){ 
+                    System.out.println("Argumentos incorrectos, uso: $> salir carcel");
+                    break;
+                }
+                salirCarcel();
                 break;
             /*
             $> salir cárcel
             el jugador sale de la carcel pagando si esta en ella
             */
             case "describir":
-
+                if(partes.length < 2){
+                    System.out.println("Argumentos incorrectos, uso: $> describir nombreCasilla | jugador nombre | avatar ID");
+                    break;
+                }
+                if(normalizar(partes[1]).equals("jugador")){
+                    if(partes.length != 3){
+                        System.out.println("Argumentos incorrectos, uso: $> describir jugador nombreJugador");
+                        break;
+                    }
+                    descJugador(partes);
+                }
+                else if(normalizar(partes[1]).equals("avatar")){
+                    if(partes.length != 3){
+                        System.out.println("Argumentos incorrectos, uso: $> describir avatar ID");
+                        break;
+                    }
+                    descAvatar(partes[2]);
+                }
+                else{
+                    if(partes.length != 2){
+                        System.out.println("Argumentos incorrectos, uso: $> describir nombreCasilla");
+                        break;
+                    }
+                    descCasilla(partes[1]);
+                }
                 break;
             /*
             $> describir Solar8
             se indicaran todas las caracteristicas de una casilla
-            $> describir Maria
+            $> describir jugador Maria
             se indacaran todas las caracteristicas de un jugador
             */
             case "comprar":
-
+                if(partes.length != 2){
+                    System.out.println("Argumentos incorrectos, uso: $> comprar nombreCasilla");
+                    break;
+                }
+                comprar(partes[1]);
                 break;
             /*
-            $> comprar Mostoles/Solar12
+            $> comprar Solar12
             el jugador compra la casilla por su nombre o numero de solar
             */
             case "ver":
@@ -281,22 +318,53 @@ public class Menu {
     /*Método que realiza las acciones asociadas al comando 'describir jugador'.
     * Parámetro: comando introducido
      */
-    private void descJugador(String[] partes) {
+    
 
+    private void descJugador(String[] partes) {
+        if (partes.length < 2) {
+            System.out.println("Argumentos incorrectos. Debes indicar el nombre del jugador.");
+            return;
+        }
+        String nombre = partes[2];
+        for (Jugador a : jugadores) {
+            if (a.getNombre().equalsIgnoreCase(nombre)) {
+                System.out.println(a.infoJugador());
+            }   
+            else{
+                System.out.println("Jugador no registrado");
+                return;
+            }
+        }
     }
+
+
 
     /*Método que realiza las acciones asociadas al comando 'describir avatar'.
     * Parámetro: id del avatar a describir.
     */
     private void descAvatar(String ID) {
-
+        for(Avatar a : avatares){
+            if(a.getId().equalsIgnoreCase(ID)){
+                System.out.println("{\n\ttipo: " + a.getTipo()
+                        + ",\n\tjugador: " + a.getJugador().getNombre()
+                        + ",\n\tcasilla: " + a.getLugar().getNombre()
+                        + "\n}");
+                return;
+            }
+        }
+        System.out.println("No existe ningún avatar con el ID " + ID + ".");
     }
 
     /* Método que realiza las acciones asociadas al comando 'describir nombre_casilla'.
     * Parámetros: nombre de la casilla a describir.
     */
     private void descCasilla(String nombre) {
-
+        Casilla encontrar = tablero.encontrar_casilla(nombre);
+        if(encontrar == null){
+            System.out.println("Casilla no encontrada");
+            return;
+        }
+        System.out.println(encontrar.infoCasilla());
     }
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'lanzar dados'.
@@ -393,12 +461,42 @@ public class Menu {
     * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
     private void comprar(String nombre) {
-
+        if(jugadores.isEmpty()){
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+        Jugador jugadorActual = jugadores.get(turno);
+        Casilla casilla = tablero.encontrar_casilla(nombre);
+        if(casilla == null){
+            System.out.println("No existe la casilla " + nombre);
+            return;
+        }
+        casilla.comprarCasilla(jugadorActual, banca);
     }
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
     private void salirCarcel() {
-
+        if(jugadores.size() < 2){
+            System.out.println("Se necesitan al menos dos jugadores para jugar");
+            return;
+        }
+        Jugador jugadorActual = jugadores.get(turno);
+        if(!jugadorActual.getEnCarcel()){
+            System.out.println(jugadorActual.getNombre() + " no se encuentra en la carcel");
+            return;
+        }
+        if(tirado){
+            System.out.println(jugadorActual.getNombre() + " ya ha lanzado los dados en este turno");
+            return;
+        }
+        if(jugadorActual.getFortuna() < Valor.PRECIO_SALIR_CARCEL){
+            System.out.println(jugadorActual.getNombre() + " no posee el dinero suficiente para salir de la carcel");
+            return;
+        }
+        jugadorActual.sumarGastos(Valor.PRECIO_SALIR_CARCEL);
+        jugadorActual.setEnCarcel(false);
+        jugadorActual.setTiradasCarcel(0);
+        System.out.println(jugadorActual.getNombre() + " paga 500.000€ y sale de la carcel.");
     }
 
     // Método que realiza las acciones asociadas al comando 'listar enventa'.
@@ -406,7 +504,6 @@ public class Menu {
         for(Casilla c : banca.getPropiedades()){
             System.out.println(c.infoCasilla());
         }
-
     }
 
     // Método que realiza las acciones asociadas al comando 'listar jugadores'.
@@ -426,9 +523,40 @@ public class Menu {
     }
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
-    private void acabarTurno() {
+    
 
+    private void acabarTurno() {
+        // Comprobar que hay jugadores registrados.
+        if (jugadores.isEmpty()) {
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+
+        // Comprobar si el jugador actual tiene deudas pendientes.
+        if (!solvente) {
+            System.out.println("El jugador actual tiene deudas pendientes y no puede acabar el turno.");
+            return;
+        }
+
+        // Comprobar si el jugador actual ha tirado los dados.
+        if (!tirado) {
+            System.out.println("Debes lanzar los dados antes de acabar el turno.");
+            return;
+        }
+
+        // Pasar el turno al siguiente jugador.
+        turno = (turno + 1) % jugadores.size();
+
+        // Reiniciar las variables para el nuevo turno.
+        tirado = false;
+        lanzamientos = 0;
+        solvente = true;
+
+        // Mostrar el jugador que tiene el turno.
+        System.out.println("El jugador actual es " + jugadores.get(turno).getNombre() + ".");
     }
+
+
 
     private static String normalizar(String texto) {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
