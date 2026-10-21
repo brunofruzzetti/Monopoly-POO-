@@ -17,7 +17,7 @@ public class Casilla {
     private float hipoteca; //Valor otorgado por hipotecar una casilla
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private Casilla parking; //referencia para acceder a parking
-    private Boolean hipotecada; //Esta hipotecada o no una casilla
+    private boolean hipotecada; //Esta hipotecada o no una casilla
 
     //Precios y alquileres de los edificios de un solar (Apéndice I).
     private float precioCasa;
