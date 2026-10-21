@@ -197,7 +197,7 @@ public class Menu {
             $> listar enventa
             lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
             */
-            case "lanzar":{
+            case "lanzar":
                 if(partes.length < 2 || partes.length > 3 || !partes[1].equalsIgnoreCase("dados")){
                     System.out.println("Error en el formato. Formato: lanzar dados [2+4]");
                     break;
@@ -223,7 +223,7 @@ public class Menu {
                     System.out.println("Error en el formato. Los dados deben ser números: lanzar dados 2+4");
                 }
                 break;
-            }
+            
             /*
             $> lanzar dados
             lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
@@ -296,6 +296,24 @@ public class Menu {
             $> comprar Solar12
             el jugador compra la casilla por su nombre o numero de solar
             */
+            case "hipotecar":
+                if(partes.length != 2){
+                    System.out.println("Argumentos incorrectos, uso: $> hipotecar nombreCasilla");
+                    break;
+                }
+                hipotecar(partes[1]);
+                break;
+            /* 
+            $> hipotecar Solar12
+            el jugador hipoteca la casilla por su nombre
+            */
+            case "deshipotecar":
+                if(partes.length != 2){
+                    System.out.println("Argumentos incorrectos, uso: $> deshipotecar nombreCasilla");
+                    break;
+                }
+                deshipotecar(partes[1]);
+                break;
             case "ver":
                 System.out.println(tablero);
                 break;
@@ -482,7 +500,30 @@ public class Menu {
         }
         casilla.comprarCasilla(jugadorActual, banca);
     }
-
+    /*Método que ejecuta todas las acciones realizadas con el comando 'hipotecar nombre_casilla'.
+    * Parámetro: cadena de caracteres con el nombre de la casilla.
+     */
+    private void hipotecar(String nombreCasilla) {
+    Jugador jugadorActual = jugadores.get(turno);
+    Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
+    if (casilla == null) {
+        System.out.println("La casilla " + nombreCasilla + " no existe.");
+        return;
+    }
+    casilla.hipotecarCasilla(jugadorActual);
+}
+    /*Método que ejecuta todas las acciones realizadas con el comando 'deshipotecar nombre_casilla'.
+    * Parámetro: cadena de caracteres con el nombre de la casilla.
+     */
+    private void deshipotecar(String nombreCasilla) {
+        Jugador jugadorActual = jugadores.get(turno);
+        Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
+        if (casilla == null) {
+            System.out.println("La casilla " + nombreCasilla + " no existe.");
+            return;
+        }
+        casilla.deshipotecarCasilla(jugadorActual);
+    }
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
     private void salirCarcel() {
         if(jugadores.size() < 2){
@@ -527,9 +568,7 @@ public class Menu {
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
-    private void listarAvatares() {
-
-    }
+    
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     
