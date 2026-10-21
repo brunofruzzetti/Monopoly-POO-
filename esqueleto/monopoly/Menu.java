@@ -196,7 +196,7 @@ public class Menu {
             $> listar enventa
             lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
             */
-            case "lanzar":{
+            case "lanzar":
                 if(partes.length < 2 || partes.length > 3 || !partes[1].equalsIgnoreCase("dados")){
                     System.out.println("Error en el formato. Formato: lanzar dados [2+4]");
                     break;
@@ -222,7 +222,7 @@ public class Menu {
                     System.out.println("Error en el formato. Los dados deben ser números: lanzar dados 2+4");
                 }
                 break;
-            }
+            
             /*
             $> lanzar dados
             lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
