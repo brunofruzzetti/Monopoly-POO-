@@ -16,6 +16,7 @@ public class Jugador {
     private int tiradasCarcel; //Cuando está en la carcel, contará las tiradas sin éxito que ha hecho allí para intentar salir (se usa para limitar el numero de intentos).
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
+    private Estadisticas estadisticas = new Estadisticas();
 
     //getters
     public String getNombre() { return nombre; }
@@ -26,6 +27,7 @@ public class Jugador {
     public int getTiradasCarcel() { return tiradasCarcel; }
     public int getVueltas() { return vueltas;}
     public ArrayList<Casilla> getPropiedades() { return propiedades; }
+    public Estadisticas getEstadisticas(){ return estadisticas; }
 
     //setters
     public void setNombre(String nombre){
@@ -104,6 +106,7 @@ public class Jugador {
     //Parámetro: valor a añadir a los gastos del jugador (será el precio de un solar, impuestos pagados...).
     public void sumarGastos(float valor) {
         this.fortuna -= valor;
+        this.estadisticas.sumarDineroInvertido(valor);
         this.gastos += valor;
     }
 
@@ -112,6 +115,7 @@ public class Jugador {
     public void encarcelar(ArrayList<ArrayList<Casilla>> pos) {
         this.enCarcel = false;
         this.tiradasCarcel = 0;
+        this.estadisticas.sumarVecesCarcel(estadisticas.getVecesCarcel() + 1);
         // La Cárcel es la primera casilla del lado oeste (índice 1, posición 0)
         // La Cárcel es la posición 11 (índice 0 del lado Oeste: pos.get(1).get(0))
         Casilla carcel = pos.get(1).get(0);

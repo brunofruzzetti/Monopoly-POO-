@@ -189,6 +189,7 @@ public class Menu {
                     case "jugadores": listarJugadores(); break;
                     case "enventa": listarVenta(); break;
                 }
+                break;
                 
             /*
             $> listar jugadores
@@ -301,6 +302,14 @@ public class Menu {
             /*
             $> ver tablero
             se muestra el tablero en pantalla
+            */
+            case "estadisticas":
+                
+                estadisticasJugador(partes);
+                break;
+            /*
+            $> estadisticas <jugador>
+            se muestran las estadisticas de un jugador
             */
             case "exit":
                 terminar = true;
@@ -524,7 +533,6 @@ public class Menu {
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     
-
     private void acabarTurno() {
         // Comprobar que hay jugadores registrados.
         if (jugadores.isEmpty()) {
@@ -556,7 +564,20 @@ public class Menu {
         System.out.println("El jugador actual es " + jugadores.get(turno).getNombre() + ".");
     }
 
-
+    // Método que realiza las acciones de 'estadisticas <jugador>'
+    private void estadisticasJugador(String[] partes){
+        if(partes.length != 2){
+            System.out.println("Argumentos incorrectos, uso: $> estadistidas <jugador>");
+            return;
+        }
+        for(Jugador j : jugadores){
+            if(j.getNombre().equalsIgnoreCase(partes[1])){
+                System.out.println(j.getEstadisticas());
+                return;
+            }
+        }
+        System.out.println("El jugador no esta registrado");
+    }
 
     private static String normalizar(String texto) {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
