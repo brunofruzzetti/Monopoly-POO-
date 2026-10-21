@@ -513,7 +513,7 @@ public class Menu {
             System.out.println("La casilla " + nombreCasilla + " no existe.");
             return;
         }
-        casilla.hipotecarCasilla(jugadorActual);
+        casilla.deshipotecarCasilla(jugadorActual);
     }
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
     private void salirCarcel() {
