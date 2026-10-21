@@ -18,6 +18,7 @@ public class Casilla {
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private Casilla parking; //referencia para acceder a parking
     private boolean hipotecada; //Esta hipotecada o no una casilla
+    private ArrayList<Edificio> edificios = new ArrayList<>(); //Edificios construidos en la casilla (si es solar).
 
     //Precios y alquileres de los edificios de un solar (Apéndice I).
     private float precioCasa;
@@ -67,6 +68,10 @@ public class Casilla {
 
     public boolean getHipotecada() {
     return hipotecada;
+    }
+
+    public ArrayList<Edificio> getEdificios() {
+        return edificios;
     }
 
     public float getPrecioCasa() {
@@ -264,7 +269,7 @@ public class Casilla {
                 float aPagar = 0;
 
                 if (this.tipo.equalsIgnoreCase("Solar")) {
-                    aPagar = this.impuesto;
+                    aPagar = calcularAlquiler();
                 } else if (this.tipo.equalsIgnoreCase("Transporte")) {
                     aPagar = this.impuesto;
                 } else if (this.tipo.equalsIgnoreCase("Servicios")) {
@@ -462,6 +467,168 @@ public class Casilla {
         System.out.println(solicitante.getNombre() + " deshipoteca " + this.nombre + " y gasta " + (long)this.hipoteca + "€.");
     }
 
+
+    //Devuelve el número de edificios de un tipo (casa, hotel, piscina o pista_deporte) construidos en la casilla.
+    public int contarEdificios(String tipoEdificio) {
+        int n = 0;
+        for (Edificio e : edificios) {
+            if (e.getTipo().equals(tipoEdificio)) n++;
+        }
+        return n;
+    }
+
+    /*Método para construir un edificio en la casilla. Parámetros:
+     * - Tipo de edificio (casa, hotel, piscina o pista_deporte).
+     * - Jugador que solicita la construcción (su avatar debe estar en la casilla).
+     * Reglas: el jugador debe ser dueño de todo el grupo; hotel requiere 4 casas (que se sustituyen),
+     * piscina un hotel y dos casas, pista de deporte dos hoteles. En un grupo de N solares
+     * no puede haber más de N edificios de cada tipo (las casas solo se limitan a N cuando ya hay N hoteles).
+     */
+    public void edificar(String tipoEdificio, Jugador solicitante) {
+        if (!tipo.equalsIgnoreCase("Solar")) {
+            System.out.println("No se puede edificar en la casilla " + nombre + " porque no es un solar.");
+            return;
+        }
+        if (!avatares.contains(solicitante.getAvatar())) {
+            System.out.println("El avatar de " + solicitante.getNombre() + " no está en la casilla " + nombre + ".");
+            return;
+        }
+        if (duenho != solicitante) {
+            System.out.println("No se puede edificar en " + nombre + " porque no pertenece a " + solicitante.getNombre() + ".");
+            return;
+        }
+        if (hipotecada) {
+            System.out.println("No se puede edificar en " + nombre + " porque está hipotecada.");
+            return;
+        }
+        if (grupo == null || !grupo.esDuenhoGrupo(solicitante)) {
+            System.out.println("No se puede edificar en " + nombre + " porque " + solicitante.getNombre()
+                    + " no es dueño de todo el grupo " + (grupo == null ? "" : grupo.getColorGrupo()) + ".");
+            return;
+        }
+
+        int maxGrupo = grupo.getNumCasillas();
+        int casas = contarEdificios("casa");
+        int hoteles = contarEdificios("hotel");
+        float precio;
+        switch (tipoEdificio) {
+            case "casa":
+                //Máximo 4 casas por solar; si el grupo ya tiene el máximo de hoteles, máximo N casas en el grupo.
+                if (casas >= 4 || (grupo.contarEdificios("hotel") >= maxGrupo && grupo.contarEdificios("casa") >= maxGrupo)) {
+                    System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
+                    return;
+                }
+                precio = precioCasa;
+                break;
+            case "hotel":
+                if (casas < 4) {
+                    System.out.println("No se puede edificar un hotel, ya que no se dispone de cuatro casas.");
+                    return;
+                }
+                if (grupo.contarEdificios("hotel") >= maxGrupo) {
+                    System.out.println("No se puede edificar ningún hotel más en esta casilla ni en el grupo al que la casilla pertenece.");
+                    return;
+                }
+                precio = precioHotel;
+                break;
+            case "piscina":
+                if (hoteles < 1) {
+                    System.out.println("No se puede edificar una piscina, ya que no se dispone de un hotel.");
+                    return;
+                }
+                if (casas < 2) {
+                    System.out.println("No se puede edificar una piscina, ya que no se dispone de dos casas.");
+                    return;
+                }
+                if (grupo.contarEdificios("piscina") >= maxGrupo) {
+                    System.out.println("No se puede edificar ninguna piscina más en esta casilla ni en el grupo al que la casilla pertenece.");
+                    return;
+                }
+                precio = precioPiscina;
+                break;
+            case "pista_deporte":
+                if (hoteles < 2) {
+                    System.out.println("No se puede edificar una pista de deporte, ya que no se dispone de dos hoteles.");
+                    return;
+                }
+                if (grupo.contarEdificios("pista_deporte") >= maxGrupo) {
+                    System.out.println("No se puede edificar ninguna pista de deporte más en esta casilla ni en el grupo al que la casilla pertenece.");
+                    return;
+                }
+                precio = precioPista;
+                break;
+            default:
+                System.out.println("Tipo de edificio incorrecto. Tipos: casa, hotel, piscina, pista_deporte.");
+                return;
+        }
+
+        if (solicitante.getFortuna() < precio) {
+            System.out.println("La fortuna de " + solicitante.getNombre() + " no es suficiente para edificar "
+                    + Edificio.conArticulo(tipoEdificio) + " en la casilla " + nombre + ".");
+            return;
+        }
+
+        //Al construir un hotel, las cuatro casas del solar se sustituyen por él.
+        if (tipoEdificio.equals("hotel")) {
+            ArrayList<Edificio> quitar = new ArrayList<>();
+            for (Edificio e : edificios) {
+                if (e.getTipo().equals("casa")) quitar.add(e);
+            }
+            for (Edificio e : quitar) {
+                edificios.remove(e);
+                solicitante.eliminarEdificio(e);
+            }
+        }
+
+        Edificio nuevo = new Edificio(tipoEdificio, this, solicitante, precio);
+        edificios.add(nuevo);
+        solicitante.anhadirEdificio(nuevo);
+        solicitante.sumarGastos(precio);
+        System.out.println("Se ha edificado " + Edificio.conArticulo(tipoEdificio) + " en " + nombre
+                + ". La fortuna de " + solicitante.getNombre() + " se reduce en " + formato(precio) + "€.");
+    }
+
+
+    /*Calcula el alquiler de un solar. Sin edificios, es el alquiler base (el doble si el dueño
+     * tiene todo el grupo); con edificios, el alquiler base más el de cada edificio construido.
+     */
+    public float calcularAlquiler() {
+        if (edificios.isEmpty()) {
+            if (grupo != null && grupo.esDuenhoGrupo(duenho)) {
+                return impuesto * 2;
+            }
+            return impuesto;
+        }
+        return impuesto
+                + contarEdificios("casa") * alquilerCasa
+                + contarEdificios("hotel") * alquilerHotel
+                + contarEdificios("piscina") * alquilerPiscina
+                + contarEdificios("pista_deporte") * alquilerPista;
+    }
+
+    //Devuelve los identificadores de los edificios de un tipo, por ejemplo "[casa-1, casa-2]" o "-".
+    private String idsEdificios(String tipoEdificio) {
+        String ids = "";
+        for (Edificio e : edificios) {
+            if (e.getTipo().equals(tipoEdificio)) {
+                if (!ids.isEmpty()) ids += ", ";
+                ids += e.getId();
+            }
+        }
+        return ids.isEmpty() ? "-" : "[" + ids + "]";
+    }
+
+    //Devuelve los edificios construidos en el solar y su alquiler (usado en 'listar edificios grupo').
+    public String infoEdificios() {
+        return "{\n"
+                + "  propiedad: " + nombre + ",\n"
+                + "  hoteles: " + idsEdificios("hotel") + ",\n"
+                + "  casas: " + idsEdificios("casa") + ",\n"
+                + "  piscinas: " + idsEdificios("piscina") + ",\n"
+                + "  pistasDeDeporte: " + idsEdificios("pista_deporte") + ",\n"
+                + "  alquiler: " + formato(calcularAlquiler()) + "\n"
+                + "}";
+    }
 
     /* Método para mostrar información de una casilla en venta.
      * Valor devuelto: texto con esa información.

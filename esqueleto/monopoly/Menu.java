@@ -1,6 +1,12 @@
 package monopoly;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -105,20 +111,47 @@ public class Menu {
         this.tirado = false;
         this.solvente = true;
 
-        System.out.println(tablero);   //imprimir tablero vacio
+        repintar(null, "");   //imprimir tablero vacio
 
         Scanner sc = new Scanner(System.in); //Objeto que lee la entrada de la termina, System.in equivale a stdin en C
         System.out.print("$> "); 
         while (!terminar && sc.hasNextLine()) { 
             String linea = sc.nextLine().trim(); //el metodo .trim() elimina el espacio inicial de un String
             if (!linea.isEmpty()){
-                analizarComando(linea); //El metodo comandos analizara la entrada del usuario y decidira que ejecutar
+                String salida = ejecutarCapturando(linea); //El metodo comandos analizara la entrada del usuario y decidira que ejecutar
+                if (!terminar){
+                    repintar(linea, salida); //Se repinta un único tablero con el resultado del comando debajo
+                }
             } 
             if (!terminar){
                 System.out.print("$> ");
             }
         }
         sc.close();
+    }
+
+    //Ejecuta un comando guardando lo que imprime, para mostrarlo después debajo del tablero.
+    private String ejecutarCapturando(String linea) {
+        PrintStream original = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
+        try {
+            analizarComando(linea);
+        } finally {
+            System.setOut(original);
+        }
+        return buffer.toString(StandardCharsets.UTF_8);
+    }
+
+    //Limpia la terminal y pinta el tablero, seguido del último comando y su resultado.
+    private void repintar(String comando, String salida) {
+        System.out.print("\u001B[H\u001B[2J\u001B[3J");
+        System.out.println(tablero);
+        System.out.println();
+        if (comando != null) {
+            System.out.println("$> " + comando);
+            System.out.print(salida);
+        }
     }
     /*Método que interpreta el comando introducido y toma la accion correspondiente.
     * Parámetro: cadena de caracteres (el comando).
@@ -127,7 +160,11 @@ public class Menu {
         String[] partes = comando.trim().split("\\s+");
         switch(normalizar(partes[0])){
             case "comandos":
-                
+                if(partes.length > 2){
+                    System.out.println("Argumentos incorrectos, uso: $> comandos [fichero]");
+                    break;
+                }
+                ejecutarFichero(partes.length == 2 ? partes[1] : "comandos.txt");
                 break;
             /*
             $> comandos 
@@ -166,7 +203,6 @@ public class Menu {
                 Jugador j = new Jugador(partes[2], partes[3], tablero.encontrar_casilla("salida"), avatares);
                 jugadores.add(j);
                 System.out.println(j);
-                System.out.println(tablero);
                 break;
             }
             /*
@@ -185,19 +221,31 @@ public class Menu {
             indica el jugador que tiene el turno
             */
             case "listar":
+                if(partes.length < 2 || partes.length > 3 || (partes.length == 3 && !normalizar(partes[1]).equals("edificios"))){
+                    System.out.println("Argumentos incorrectos, uso: $> listar jugadores | enventa | edificios [grupo]");
+                    break;
+                }
                 switch(normalizar(partes[1])){
                     case "jugadores": listarJugadores(); break;
                     case "enventa": listarVenta(); break;
+                    case "edificios":
+                        if(partes.length == 3) listarEdificios(partes[2]);
+                        else listarEdificios();
+                        break;
+                    default: System.out.println("Argumentos incorrectos, uso: $> listar jugadores | enventa | edificios [grupo]");
                 }
                 break;
-                
             /*
             $> listar jugadores
             lista los jugadores que juegan
             $> listar enventa
             lista las propiedades que quedan en venta (se mostra el tablero en pantalla)
+            $> listar edificios
+            lista los edificios construidos
+            $> listar edificios Rojo
+            lista los edificios construidos en un grupo y lo que aún se puede construir
             */
-            case "lanzar":
+            case "lanzar":{
                 if(partes.length < 2 || partes.length > 3 || !partes[1].equalsIgnoreCase("dados")){
                     System.out.println("Error en el formato. Formato: lanzar dados [2+4]");
                     break;
@@ -223,12 +271,12 @@ public class Menu {
                     System.out.println("Error en el formato. Los dados deben ser números: lanzar dados 2+4");
                 }
                 break;
-            
+            }
             /*
             $> lanzar dados
             lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
             $> lanzar dados 2+4
-            los dos dados tienen un valor forzoso moviendo al jugador esas posiciones (se repinta el tablero)
+            los dos dados tienen un valor frozoso moviendo al jugador esas posiciones (se repinta el tablero)
             */
             case "acabar":
                 if (partes.length != 2 || !partes[1].equalsIgnoreCase("turno")) {
@@ -242,7 +290,7 @@ public class Menu {
             el jugador actual decide que su turno ha acabado y el turno pasa al siguiente
             */
             case "salir":
-                if(!normalizar(partes[1]).equalsIgnoreCase("carcel") || partes.length != 2){ 
+                if(partes.length != 2 || !normalizar(partes[1]).equals("carcel")){
                     System.out.println("Argumentos incorrectos, uso: $> salir carcel");
                     break;
                 }
@@ -314,9 +362,22 @@ public class Menu {
                 }
                 deshipotecar(partes[1]);
                 break;
-            case "ver":
-                System.out.println(tablero);
+            case "edificar":
+                if(partes.length != 2){
+                    System.out.println("Argumentos incorrectos, uso: $> edificar casa|hotel|piscina|pista_deporte");
+                    break;
+                }
+                edificar(partes[1].toLowerCase());
                 break;
+            /*
+            $> edificar casa
+            el jugador edifica en la casilla en la que se encuentra su avatar
+            */
+            case "ver":
+                if(partes.length != 2 || !normalizar(partes[1]).equals("tablero")){
+                    System.out.println("Argumentos incorrectos, uso: $> ver tablero");
+                }
+                break; //El tablero se repinta después de cada comando, por lo que ya queda en pantalla.
             /*
             $> ver tablero
             se muestra el tablero en pantalla
@@ -356,12 +417,10 @@ public class Menu {
         for (Jugador a : jugadores) {
             if (a.getNombre().equalsIgnoreCase(nombre)) {
                 System.out.println(a.infoJugador());
-            }   
-            else{
-                System.out.println("Jugador no registrado");
                 return;
             }
         }
+        System.out.println("Jugador no registrado");
     }
 
 
@@ -453,8 +512,8 @@ public class Menu {
                 if(lanzamientos == 3){
                     jugadorActual.encarcelar(tablero.getPosiciones());
                     lanzamientos = 0;
+                    tirado = true;
                     System.out.println(jugadorActual.getNombre() + " saca dobles por tercera vez y va a la carcel.");
-                    System.out.println(tablero);
                     return;
                 }
                 //no son sus terceros dobles consecutivos
@@ -477,10 +536,8 @@ public class Menu {
             jugadorActual.encarcelar(tablero.getPosiciones());
             tirado = true;
             lanzamientos = 0;
-            System.out.println(jugadorActual.getNombre() + " se coloca en la casilla de carcel");
+            System.out.println("El avatar se coloca en la casilla de Cárcel.");
         }
-
-        System.out.println(tablero); //se repinta el tablero
 
     }
 
@@ -500,6 +557,7 @@ public class Menu {
         }
         casilla.comprarCasilla(jugadorActual, banca);
     }
+
     /*Método que ejecuta todas las acciones realizadas con el comando 'hipotecar nombre_casilla'.
     * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
@@ -524,6 +582,18 @@ public class Menu {
         }
         casilla.deshipotecarCasilla(jugadorActual);
     }
+    /*Método que ejecuta todas las acciones realizadas con el comando 'edificar tipo_edificio'.
+    * Se edifica en la casilla en la que se encuentra el avatar del jugador que tiene el turno.
+     */
+    private void edificar(String tipoEdificio) {
+        if(jugadores.isEmpty()){
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+        Jugador jugadorActual = jugadores.get(turno);
+        jugadorActual.getAvatar().getLugar().edificar(tipoEdificio, jugadorActual);
+    }
+
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
     private void salirCarcel() {
         if(jugadores.size() < 2){
@@ -546,13 +616,40 @@ public class Menu {
         jugadorActual.sumarGastos(Valor.PRECIO_SALIR_CARCEL);
         jugadorActual.setEnCarcel(false);
         jugadorActual.setTiradasCarcel(0);
-        System.out.println(jugadorActual.getNombre() + " paga 500.000€ y sale de la carcel.");
+        System.out.println(jugadorActual.getNombre() + " paga 500.000€ y sale de la cárcel. Puede lanzar los dados.");
     }
 
     // Método que realiza las acciones asociadas al comando 'listar enventa'.
+    //Método que realiza las acciones asociadas al comando 'listar edificios'.
+    private void listarEdificios() {
+        ArrayList<Edificio> edificios = new ArrayList<>();
+        for (Jugador j : jugadores) {
+            edificios.addAll(j.getEdificios());
+        }
+        if (edificios.isEmpty()) {
+            System.out.println("No hay edificios construidos.");
+            return;
+        }
+        for (int i = 0; i < edificios.size(); i++) {
+            System.out.println(edificios.get(i).infoEdificio() + (i < edificios.size() - 1 ? "," : ""));
+        }
+    }
+
+    //Método que realiza las acciones asociadas al comando 'listar edificios grupo'.
+    private void listarEdificios(String color) {
+        for (Grupo g : tablero.getGrupos().values()) {
+            if (normalizar(g.getColorGrupo()).equals(normalizar(color))) {
+                System.out.println(g.infoEdificios());
+                return;
+            }
+        }
+        System.out.println("No existe el grupo " + color + ".");
+    }
+
     private void listarVenta() {
-        for(Casilla c : banca.getPropiedades()){
-            System.out.println(c.infoCasilla());
+        ArrayList<Casilla> enVenta = banca.getPropiedades();
+        for(int i = 0; i < enVenta.size(); i++){
+            System.out.println(enVenta.get(i).casEnVenta() + (i < enVenta.size() - 1 ? "," : ""));
         }
     }
 
@@ -562,16 +659,34 @@ public class Menu {
             System.out.println("No hay jugadores registrados");
             return;
         }
-        for (Jugador a : jugadores){
-            System.out.println(a);
+        for(int i = 0; i < jugadores.size(); i++){
+            System.out.println(jugadores.get(i).infoJugador() + (i < jugadores.size() - 1 ? "," : ""));
+        }
+    }
+
+    //Método que ejecuta los comandos de un fichero (uno por línea), mostrando cada comando antes de ejecutarlo.
+    private void ejecutarFichero(String ruta) {
+        try{
+            for(String linea : Files.readAllLines(Paths.get(ruta))){
+                linea = linea.trim();
+                if(linea.isEmpty()) continue;
+                System.out.println(linea);
+                analizarComando(linea);
+                if(terminar) return;
+            }
+        }catch(IOException e){
+            System.out.println("No se puede leer el fichero " + ruta);
         }
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
-    
+    private void listarAvatares() {
+
+    }
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     
+
     private void acabarTurno() {
         // Comprobar que hay jugadores registrados.
         if (jugadores.isEmpty()) {
@@ -603,6 +718,12 @@ public class Menu {
         System.out.println("El jugador actual es " + jugadores.get(turno).getNombre() + ".");
     }
 
+
+
+    private static String normalizar(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
+    }
+
     // Método que realiza las acciones de 'estadisticas <jugador>'
     private void estadisticasJugador(String[] partes){
         if(partes.length != 2){
@@ -617,9 +738,4 @@ public class Menu {
         }
         System.out.println("El jugador no esta registrado");
     }
-
-    private static String normalizar(String texto) {
-        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
-    }
-
 }
