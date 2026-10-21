@@ -17,6 +17,7 @@ public class Casilla {
     private float hipoteca; //Valor otorgado por hipotecar una casilla
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private Casilla parking; //referencia para acceder a parking
+    private Boolean hipotecada; //Esta hipotecada o no una casilla
 
     //Precios y alquileres de los edificios de un solar (Apéndice I).
     private float precioCasa;
@@ -62,6 +63,10 @@ public class Casilla {
 
     public ArrayList<Avatar> getAvatares() {
         return avatares;
+    }
+
+    public boolean getHipotecada() {
+    return hipotecada;
     }
 
     public float getPrecioCasa() {
@@ -135,6 +140,10 @@ public class Casilla {
     public void setParking(Casilla parking){
         this.parking = parking;
     }
+
+    public void setHipotecada(boolean hipotecada) {
+    this.hipotecada = hipotecada;
+}
 
     /*Método para establecer los datos de un solar según el Apéndice I. Parámetros:
      * hipoteca, alquiler, precios de casa, hotel, piscina y pista de deporte, y
@@ -415,6 +424,45 @@ public class Casilla {
         return "No tiene sentido describir la casilla " + nombre + ".";
     }
 
+    // Metodo para hipotecar una casilla
+    public void hipotecarCasilla(Jugador solicitante){
+        if (this.duenho != solicitante){
+            System.out.println(solicitante.getNombre() + " no puede hipotecar " + this.nombre + " porque no le pertenece.");
+            return;
+        }
+        if (this.hipotecada){
+            System.out.println(this.nombre + " ya esta hipotecada.");
+            return;
+        }
+        if (this.hipoteca <= 0){
+            System.out.println("La casilla no se puede hipotecar");
+        }
+        solicitante.sumarFortuna(this.hipoteca);
+        solicitante.anhadirHipoteca(this);
+        this.hipotecada = true;
+        System.out.println(solicitante.getNombre() + " hipoteca " + this.nombre + " y recibe " + (long) this.hipoteca + "€.");
+    }
+
+    public void deshipotecarCasilla(Jugador solicitante){
+        if (this.duenho != solicitante){
+            System.out.println(solicitante.getNombre() + " no puede deshipotecar " + this.nombre + " porque no le pertenece.");
+            return;
+        }
+        if (!this.hipotecada){
+            System.out.println(this.nombre + " no esta hipotecada.");
+            return;
+        }
+        if (solicitante.getFortuna() < this.hipoteca){
+            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero.");
+            return;
+        } 
+        solicitante.sumarFortuna(-this.hipoteca);
+        solicitante.sumarGastos(this.hipoteca);
+        this.hipotecada = false;
+        System.out.println(solicitante.getNombre() + " deshipoteca " + this.nombre + " y gasta " + (long)this.hipoteca + "€.");
+    }
+
+
     /* Método para mostrar información de una casilla en venta.
      * Valor devuelto: texto con esa información.
      */
@@ -436,5 +484,4 @@ public class Casilla {
     private static String formato(float cantidad) {
         return String.format("%.0f", cantidad);
     }
-
 }

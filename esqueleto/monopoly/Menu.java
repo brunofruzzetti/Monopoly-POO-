@@ -295,6 +295,24 @@ public class Menu {
             $> comprar Solar12
             el jugador compra la casilla por su nombre o numero de solar
             */
+            case "hipotecar":
+                if(partes.length != 2){
+                    System.out.println("Argumentos incorrectos, uso: $> hipotecar nombreCasilla");
+                    break;
+                }
+                hipotecar(partes[1]);
+                break;
+            /* 
+            $> hipotecar Solar12
+            el jugador hipoteca la casilla por su nombre
+            */
+            case "deshipotecar":
+                if(partes.length != 2){
+                    System.out.println("Argumentos incorrectos, uso: $> deshipotecar nombreCasilla");
+                    break;
+                }
+                deshipotecar(partes[1]);
+                break;
             case "ver":
                 System.out.println(tablero);
                 break;
@@ -473,7 +491,30 @@ public class Menu {
         }
         casilla.comprarCasilla(jugadorActual, banca);
     }
-
+    /*Método que ejecuta todas las acciones realizadas con el comando 'hipotecar nombre_casilla'.
+    * Parámetro: cadena de caracteres con el nombre de la casilla.
+     */
+    private void hipotecar(String nombreCasilla) {
+    Jugador jugadorActual = jugadores.get(turno);
+    Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
+    if (casilla == null) {
+        System.out.println("La casilla " + nombreCasilla + " no existe.");
+        return;
+    }
+    casilla.hipotecarCasilla(jugadorActual);
+}
+    /*Método que ejecuta todas las acciones realizadas con el comando 'deshipotecar nombre_casilla'.
+    * Parámetro: cadena de caracteres con el nombre de la casilla.
+     */
+    private void deshipotecar(String nombreCasilla) {
+        Jugador jugadorActual = jugadores.get(turno);
+        Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
+        if (casilla == null) {
+            System.out.println("La casilla " + nombreCasilla + " no existe.");
+            return;
+        }
+        casilla.hipotecarCasilla(jugadorActual);
+    }
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
     private void salirCarcel() {
         if(jugadores.size() < 2){
@@ -518,9 +559,7 @@ public class Menu {
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
-    private void listarAvatares() {
-
-    }
+    
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     

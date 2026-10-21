@@ -16,6 +16,7 @@ public class Jugador {
     private int tiradasCarcel; //Cuando está en la carcel, contará las tiradas sin éxito que ha hecho allí para intentar salir (se usa para limitar el numero de intentos).
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
+    private ArrayList<Casilla> hipotecas; // propiedades hipotecadas que posee el jugador.
 
     //getters
     public String getNombre() { return nombre; }
@@ -26,6 +27,7 @@ public class Jugador {
     public int getTiradasCarcel() { return tiradasCarcel; }
     public int getVueltas() { return vueltas;}
     public ArrayList<Casilla> getPropiedades() { return propiedades; }
+    public ArrayList<Casilla> getHipotecas(){ return hipotecas; }
 
     //setters
     public void setNombre(String nombre){
@@ -52,6 +54,9 @@ public class Jugador {
     public void setPropiedades(ArrayList<Casilla> propiedades){
         this.propiedades = propiedades;
     }
+    public void setHipotecas(ArrayList<Casilla> hipotecas){
+        this.hipotecas = hipotecas;
+    }
 
 
 
@@ -72,6 +77,7 @@ public class Jugador {
         this.nombre = nombre;
         fortuna = Valor.FORTUNA_INICIAL;
         propiedades = new ArrayList<>();
+        hipotecas = new ArrayList<>();
         avatar = new Avatar(tipoAvatar, this, inicio, avCreados);
         if (avCreados != null){
             avCreados.add(this.avatar);
@@ -91,6 +97,20 @@ public class Jugador {
     public void eliminarPropiedad(Casilla casilla) {
         if (casilla != null) {
             this.propiedades.remove(casilla);
+        }
+    }
+
+    //Método para añadir una hipoteca al jugador. Como parámetro, la casilla a añadir.
+    public void anhadirHipoteca(Casilla casilla){
+        if (casilla != null && !this.hipotecas.contains(casilla)){
+            this.hipotecas.add(casilla);
+        }
+    }
+
+    //Método para eliminar una propiedad del arraylist de propiedades de jugador.     
+    public void eliminarHipoteca(Casilla casilla){
+        if (casilla != null){
+            this.hipotecas.remove(casilla);
         }
     }
 
