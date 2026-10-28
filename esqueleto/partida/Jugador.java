@@ -133,7 +133,7 @@ public class Jugador {
     /*Método para establecer al jugador en la cárcel. 
     * Se requiere disponer de las casillas del tablero para ello (por eso se pasan como parámetro).*/
     public void encarcelar(ArrayList<ArrayList<Casilla>> pos) {
-        this.enCarcel = false;
+        this.enCarcel = true;
         this.tiradasCarcel = 0;
         this.estadisticas.sumarVecesCarcel(estadisticas.getVecesCarcel() + 1);
         // La Cárcel es la primera casilla del lado oeste (índice 1, posición 0)

@@ -228,7 +228,7 @@ public class Menu {
             $> lanzar dados
             lanza los dos dados de forma aleatorio moviendo al jugador esas posiciones (se repinta el tablero)
             $> lanzar dados 2+4
-            los dos dados tienen un valor frozoso moviendo al jugador esas posiciones (se repinta el tablero)
+            los dos dados tienen un valor forzoso moviendo al jugador esas posiciones (se repinta el tablero)
             */
             case "acabar":
                 if (partes.length != 2 || !partes[1].equalsIgnoreCase("turno")) {
