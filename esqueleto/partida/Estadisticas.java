@@ -8,6 +8,7 @@ public class Estadisticas {
     private float pasarSalida;
     private float premios;
     private int vecesCarcel;
+    private int vueltas;
 
     //getters
     public float getDineroInvertido(){ return dineroInvertido; }
@@ -17,6 +18,7 @@ public class Estadisticas {
     public float getpasarSalida(){ return pasarSalida; }
     public float getPremios(){ return premios; }
     public int getVecesCarcel(){ return vecesCarcel; }
+    public int getVueltas(){ return vueltas; }
 
     //setters
     public void sumarDineroInvertido(float dineroInvertido){
@@ -37,6 +39,9 @@ public class Estadisticas {
     public void sumarVecesCarcel(int vecesCarcel){
         this.vecesCarcel += vecesCarcel;
     }
+    public void sumarVueltas(int vueltas){
+        this.vueltas += vueltas;
+    }
 
     public Estadisticas(){
         dineroInvertido = 0;
@@ -46,6 +51,7 @@ public class Estadisticas {
         pasarSalida = 0;
         premios = 0;
         vecesCarcel = 0;
+        vueltas = 0;
     }
 
     @Override

@@ -18,6 +18,8 @@ public class Casilla {
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private Casilla parking; //referencia para acceder a parking
     private boolean hipotecada; //Esta hipotecada o no una casilla
+    private float dineroAcomulado; //valor de cuanto ha dinero ha generado una casilla
+    private int frecuentado; //numero de veces que han pasado por una casilla
 
     //Precios y alquileres de los edificios de un solar (Apéndice I).
     private float precioCasa;
@@ -29,6 +31,7 @@ public class Casilla {
     private float alquilerPiscina;
     private float alquilerPista;
 
+    //getters
     public String getNombre() {
         return nombre;
     }
@@ -101,6 +104,11 @@ public class Casilla {
         return alquilerPista;
     }
 
+    public float getDineroAcomulado() { return dineroAcomulado; }
+
+    public int getFrecuentado() { return frecuentado; }
+
+    //setters
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -142,8 +150,8 @@ public class Casilla {
     }
 
     public void setHipotecada(boolean hipotecada) {
-    this.hipotecada = hipotecada;
-}
+        this.hipotecada = hipotecada;
+    }
 
     /*Método para establecer los datos de un solar según el Apéndice I. Parámetros:
      * hipoteca, alquiler, precios de casa, hotel, piscina y pista de deporte, y
@@ -162,12 +170,22 @@ public class Casilla {
         this.alquilerHotel = alquilerHotel;
         this.alquilerPiscina = alquilerPiscina;
         this.alquilerPista = alquilerPista;
+        this.dineroAcomulado = 0;
+        this.frecuentado = 0;
     }
 
-
+    //Suma el dinero obtenido de una casilla a lo que ya ha acomulado
+    public void sumarDineroAcomulado(float dineroAcomulado){
+        this.dineroAcomulado += dineroAcomulado;
+    }
+    //suma 1 a la casilla donde el jugador ha caido para indicar cuantas veces han caido en esa casilla
+    public void sumarFrecuencia(){
+        this.frecuentado++;  
+    }
+    
     //Constructores:
     public Casilla() {
-    avatares = new ArrayList<>();
+        avatares = new ArrayList<>();
     }//Parámetros vacíos
 
     /*Constructor para casillas tipo Solar, Servicios o Transporte:
@@ -189,6 +207,8 @@ public class Casilla {
             this.impuesto = 0;
         }
         this.avatares = new ArrayList<>();
+        this.dineroAcomulado = 0;
+        this.frecuentado = 0;
     }
 
     /*Constructor utilizado para inicializar las casillas de tipo IMPUESTOS.
@@ -203,6 +223,7 @@ public class Casilla {
         this.valor = 0;
         this.hipoteca = 0;
         this.avatares = new ArrayList<>();
+        this.frecuentado = 0;
     }
 
     /*Constructor utilizado para crear las otras casillas (Suerte, Caja de comunidad y Especiales):
@@ -217,6 +238,8 @@ public class Casilla {
         this.impuesto = 0;
         this.hipoteca = 0;
         this.avatares = new ArrayList<>();
+        this.dineroAcomulado = 0;
+        this.frecuentado = 0;
     }
 
     //Devuelve el nombre de la casilla seguido de los avatares que hay en ella (por ejemplo "Solar9 &H").
@@ -257,6 +280,7 @@ public class Casilla {
     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
     * en caso de no cumplirlas.*/
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
+        sumarFrecuencia();
         // 1. Casillas comprables (Solar, Transporte, Servicios)
         if (esComprable()) {
             // Si la casilla tiene dueño, y no es la banca ni el propio jugador
@@ -279,6 +303,7 @@ public class Casilla {
 
                 actual.sumarGastos(aPagar);
                 this.duenho.sumarFortuna(aPagar);
+                sumarDineroAcomulado(aPagar);
                 System.out.println("Se han pagado " + formato(aPagar) + "€ de alquiler a " + this.duenho.getNombre() + ".");
                 return true;
             }
@@ -295,6 +320,7 @@ public class Casilla {
             if (parking != null) {
                 parking.sumarValor(tasa);
             }
+            sumarDineroAcomulado(tasa);
             System.out.println("El jugador paga " + formato(tasa) + "€ que se depositan en el Parking.");
             return true;
         }

@@ -105,4 +105,12 @@ public class Grupo {
         return true;
     }
 
+    public float dineroAcomuladoGrupo(){
+        float salida = 0;
+        for(Casilla c : miembros){
+            salida += c.getDineroAcomulado();
+        }
+        return salida;
+    }
+
 }

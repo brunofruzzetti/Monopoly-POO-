@@ -188,6 +188,8 @@ public class Menu {
                 switch(normalizar(partes[1])){
                     case "jugadores": listarJugadores(); break;
                     case "enventa": listarVenta(); break;
+                    case "avatares": listarAvatares(); break;
+                    default: System.out.println("Argumentos incorrectos, uso: $> listar jugadores|enventa|avatares");
                 }
                 break;
                 
@@ -254,7 +256,7 @@ public class Menu {
             */
             case "describir":
                 if(partes.length < 2){
-                    System.out.println("Argumentos incorrectos, uso: $> describir nombreCasilla | jugador nombre | avatar ID");
+                    System.out.println("Argumentos incorrectos, uso: $> describir nombreCasilla|jugador nombreJugador|avatar ID");
                     break;
                 }
                 if(normalizar(partes[1]).equals("jugador")){
@@ -314,6 +316,10 @@ public class Menu {
                 }
                 deshipotecar(partes[1]);
                 break;
+            /* 
+            $> deshipotecar Solar12
+            el jugador deshipoteca la casilla por su nombre
+            */
             case "ver":
                 System.out.println(tablero);
                 break;
@@ -322,9 +328,17 @@ public class Menu {
             se muestra el tablero en pantalla
             */
             case "estadisticas":
-                
-                estadisticasJugador(partes);
+                if (partes.length == 1){
+
+                    break;
+                }
+                else if (partes.length == 2){
+                    estadisticasJugador(partes);
+                    break;
+                }
+                System.out.println("Argumentos incorrectos, uso: $> estadistidas <jugador>");
                 break;
+
             /*
             $> estadisticas <jugador>
             se muestran las estadisticas de un jugador
@@ -568,7 +582,19 @@ public class Menu {
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
-    
+    private void listarAvatares(){
+        if(avatares.isEmpty()){
+            System.out.println("No hay avatares registrados");
+            return;
+        }
+        for(Avatar a : avatares){
+            System.out.println("{\n\tid: " + a.getId()
+                    + ",\n\ttipo: " + a.getTipo()
+                    + ",\n\tjugador: " + a.getJugador().getNombre()
+                    + ",\n\tcasilla: " + a.getLugar().getNombre()
+                    + "\n}");
+        }
+    }
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     
@@ -601,6 +627,11 @@ public class Menu {
 
         // Mostrar el jugador que tiene el turno.
         System.out.println("El jugador actual es " + jugadores.get(turno).getNombre() + ".");
+    }
+
+    // Método que realiza las acciones de 'estadisticas'
+    private void estadisticas(){
+        
     }
 
     // Método que realiza las acciones de 'estadisticas <jugador>'
