@@ -528,7 +528,7 @@ public class Menu {
         }
         jugadorActual.getAvatar().moverAvatar(tablero.getPosiciones(), d1 + d2); //se mueve el jugador las posiciones de los dados
         Casilla destino = jugadorActual.getAvatar().getLugar();
-        solvente = destino.evaluarCasilla(jugadorActual, banca, d1 + d2); //evaluar la casilla de destino
+        solvente = destino.evaluarCasilla(jugadorActual, banca, d1 + d2, tablero, jugadores); //evaluar la casilla de destino
         if(!solvente){
             System.out.println(jugadorActual.getNombre() + " debe hipotecar alguna propiedad o declararse en bancarrota.");
         }
@@ -616,7 +616,7 @@ public class Menu {
         jugadorActual.sumarGastos(Valor.PRECIO_SALIR_CARCEL);
         jugadorActual.setEnCarcel(false);
         jugadorActual.setTiradasCarcel(0);
-        System.out.println(jugadorActual.getNombre() + " paga 500.000€ y sale de la cárcel. Puede lanzar los dados.");
+        System.out.println(jugadorActual.getNombre() + " paga 500000€ y sale de la cárcel. Puede lanzar los dados.");
     }
 
     // Método que realiza las acciones asociadas al comando 'listar enventa'.
@@ -678,12 +678,12 @@ public class Menu {
             System.out.println("No se puede leer el fichero " + ruta);
         }
     }
-
+/*  
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
     private void listarAvatares() {
 
     }
-
+*/
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
     
 

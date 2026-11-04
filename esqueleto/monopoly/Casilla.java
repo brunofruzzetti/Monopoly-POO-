@@ -261,7 +261,7 @@ public class Casilla {
     * - El valor de la tirada: para determinar impuesto a pagar en casillas de servicios.
     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
     * en caso de no cumplirlas.*/
-    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
+    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada, Tablero tablero, ArrayList<Jugador> jugadores) {
         // 1. Casillas comprables (Solar, Transporte, Servicios)
         if (esComprable()) {
             // Si la casilla tiene dueño, y no es la banca ni el propio jugador
@@ -314,6 +314,16 @@ public class Casilla {
                 System.out.println("El Parking no tiene bote acumulado actualmente.");
             }
             return true;
+        }
+        // 4. Casillas de Suerte o Comunidad
+            if (this.tipo.equalsIgnoreCase("Suerte") && tablero != null) {
+                Carta carta = tablero.sacarCartaSuerte();
+                return carta.accionar(actual, banca, jugadores, tablero);
+        }
+
+            if ((this.tipo.equalsIgnoreCase("Comunidad") || this.nombre.equalsIgnoreCase("Caja")) && tablero != null) {
+                Carta carta = tablero.sacarCartaComunidad();
+                return carta.accionar(actual, banca, jugadores, tablero);
         }
         // 4. Suerte, Caja de Comunidad, Salida o Cárcel de visita
         return true;

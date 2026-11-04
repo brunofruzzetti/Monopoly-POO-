@@ -11,6 +11,12 @@ public class Tablero {
     private ArrayList<ArrayList<Casilla>> posiciones; //Posiciones del tablero: se define como un arraylist de arraylists de casillas (uno por cada lado del tablero).
     private HashMap<String, Grupo> grupos; //Grupos del tablero, almacenados como un HashMap con clave String (será el color del grupo).
     private Jugador banca; //Un jugador que será la banca.
+    private ArrayList<Carta> cartasSuerte;
+    private ArrayList<Carta> cartasComunidad;
+    private int indiceSuerte = 0;
+    private int indiceComunidad = 0;
+
+
 
     public ArrayList<ArrayList<Casilla>> getPosiciones() {
         return posiciones;
@@ -55,6 +61,7 @@ public class Tablero {
                 }
             }
         }
+        this.inicializarBarajas();
     }
 
 
@@ -225,6 +232,41 @@ public class Tablero {
         String texto = String.format("%-" + ancho + "s", c.toString());
         String color = (c.getGrupo() != null) ? c.getGrupo().getCodigoColor() : "";
         return color + Valor.SUBRAYADO + texto + Valor.RESET;
+    }
+
+    private void inicializarBarajas() {
+        this.cartasSuerte = new ArrayList<>();
+        this.cartasComunidad = new ArrayList<>();
+
+        // Cartas de Suerte(1 a 7)
+        cartasSuerte.add(new Carta(1, "Suerte", "Decides hacer un viaje de placer. Avanza hasta Solar19. Si pasas por Salida, cobras"));
+        cartasSuerte.add(new Carta(2, "Suerte", "Los acreedores te persiguen por impago. Ve a la Cárcel. Ve directamente sin pasar por la casilla de Salida y sin cobrar los 2000000€."));
+        cartasSuerte.add(new Carta(3, "Suerte", "¡Has ganado el bote de la lotería! Recibe 1000000€."));
+        cartasSuerte.add(new Carta(4, "Suerte", "Has sido elegido presidente de la junta directiva. Paga a cada jugador 250000€."));
+        cartasSuerte.add(new Carta(5, "Suerte", "¡Hora punta de tráfico! Retrocede tres casillas."));
+        cartasSuerte.add(new Carta(6, "Suerte", "Te multan por usar el móvil mientras conduces. Paga 150000€."));
+        cartasSuerte.add(new Carta(7, "Suerte", "Avanza hasta la casilla de transporte más cercana. Si no tiene dueño, puedes comprarla. Si tiene dueño, paga al dueño el doble de la operación indicada."));
+
+        // Cartas de Comunidad(1 a 7)
+        cartasComunidad.add(new Carta(1, "Comunidad", "Paga 500000€ por un fin de semana en un balneario de 5 estrellas."));
+        cartasComunidad.add(new Carta(2, "Comunidad", "Te investigan por fraude de identidad. Ve a la Cárcel. Ve directamente sin pasar por la casilla de Salida y sin cobrar los 2000000€."));
+        cartasComunidad.add(new Carta(3, "Comunidad", "Colócate en la casilla de Salida. Cobra 2000000€."));
+        cartasComunidad.add(new Carta(4, "Comunidad", "Devolución de Hacienda. Cobra 500000€."));
+        cartasComunidad.add(new Carta(5, "Comunidad", "Retrocede hasta Solar1 para comprar antigüedades exóticas."));
+        cartasComunidad.add(new Carta(6, "Comunidad", "Ve a Solar20 para disfrutar del San Fermín. Si pasas por la casilla de Salida, cobra 2000000€."));
+    }
+
+    public Carta sacarCartaSuerte() {
+        Carta c = cartasSuerte.get(indiceSuerte);
+        // Avanza el índice y vuelve a 0 cuando llega a 7
+        indiceSuerte = (indiceSuerte + 1) % 7;
+        return c;
+    }
+
+    public Carta sacarCartaComunidad() {
+        Carta c = cartasComunidad.get(indiceComunidad);
+        indiceComunidad = (indiceSuerte + 1) % 6;
+        return c;
     }
 
     //Método usado para buscar la casilla con el nombre pasado como argumento (sin distinguir mayúsculas ni tildes):
