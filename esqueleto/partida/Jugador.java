@@ -18,6 +18,7 @@ public class Jugador {
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
     private Estadisticas estadisticas = new Estadisticas();
     private ArrayList<Casilla> hipotecas; // propiedades hipotecadas que posee el jugador.
+    private ArrayList<Edificio> edificios = new ArrayList<>(); //Edificios construidos por el jugador.
 
     //getters
     public String getNombre() { return nombre; }
@@ -30,6 +31,7 @@ public class Jugador {
     public ArrayList<Casilla> getPropiedades() { return propiedades; }
     public Estadisticas getEstadisticas(){ return estadisticas; }
     public ArrayList<Casilla> getHipotecas(){ return hipotecas; }
+    public ArrayList<Edificio> getEdificios(){ return edificios; }
 
     //setters
     public void setNombre(String nombre){
@@ -116,6 +118,20 @@ public class Jugador {
         }
     }
 
+    //Método para añadir un edificio al jugador.
+    public void anhadirEdificio(Edificio edificio){
+        if (edificio != null && !this.edificios.contains(edificio)){
+            this.edificios.add(edificio);
+        }
+    }
+
+    //Método para eliminar un edificio del jugador (por ejemplo, las casas sustituidas por un hotel).
+    public void eliminarEdificio(Edificio edificio){
+        if (edificio != null){
+            this.edificios.remove(edificio);
+        }
+    }
+
     //Método para añadir fortuna a un jugador
     //Como parámetro se pide el valor a añadir. Si hay que restar fortuna, se pasaría un valor negativo.
     public void sumarFortuna(float valor) {
@@ -152,8 +168,37 @@ public class Jugador {
         return this.fortuna >= cantidad;
     }
 
+    //Devuelve toda la información del jugador (usado en 'listar jugadores' y 'describir jugador').
+    //Las hipotecas aún no se muestran en esta entrega.
     public String infoJugador(){
-        String salida = "";
+        String idAvatar = (this.avatar != null) ? this.avatar.getId() : "-";
+        String props = "-";
+        if (!this.propiedades.isEmpty()) {
+            props = "[";
+            for (int i = 0; i < this.propiedades.size(); i++) {
+                if (i > 0) props += ", ";
+                props += this.propiedades.get(i).getNombre();
+            }
+            props += "]";
+        }
+
+        String salida = "{\n";
+        salida = salida + "  nombre: " + this.nombre + ",\n";
+        salida = salida + "  avatar: " + idAvatar + ",\n";
+        salida = salida + "  fortuna: " + String.format("%.0f", this.fortuna) + ",\n";
+        salida = salida + "  propiedades: " + props + "\n";
+        salida = salida + "  hipotecas: -\n";
+        String edifs = "-";
+        if (!this.edificios.isEmpty()) {
+            edifs = "[";
+            for (int i = 0; i < this.edificios.size(); i++) {
+                if (i > 0) edifs += ", ";
+                edifs += this.edificios.get(i).getId();
+            }
+            edifs += "]";
+        }
+        salida = salida + "  edificios: " + edifs + "\n";
+        salida = salida + "}";
         return salida;
     }
     @Override

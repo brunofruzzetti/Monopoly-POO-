@@ -64,18 +64,10 @@ public class Avatar {
         }
 
         // Posición actual de 0 a 39
-        int posActual = this.lugar.getPosicion() - 1;
+        Casilla origen = this.lugar;
+        int posActual = origen.getPosicion() - 1;
         int suma = posActual + valorTirada;
         int nuevaPos = suma % 40;
-
-        // Comprobar si pasa o cae en la casilla de Salida
-        if (suma >= 40) {
-            if (this.jugador != null) {
-                this.jugador.setVueltas(this.jugador.getVueltas() + 1);
-                this.jugador.sumarFortuna(Valor.SUMA_VUELTA);
-                System.out.println(this.jugador.getNombre() + " pasa por la Salida y cobra " + (long) Valor.SUMA_VUELTA + "€.");
-            }
-        }
 
         // Localizar la casilla de destino en la matriz de lados
         int lado = nuevaPos / 10;
@@ -87,7 +79,16 @@ public class Avatar {
         this.lugar = destino;
         this.lugar.anhadirAvatar(this);
 
-        System.out.println("El avatar " + this.id + " avanza " + valorTirada + " posiciones hasta " + destino.getNombre() + ".");
+        System.out.println("El avatar " + this.id + " avanza " + valorTirada + " posiciones, desde " + origen.getNombre() + " hasta " + destino.getNombre() + ".");
+
+        // Comprobar si pasa o cae en la casilla de Salida
+        if (suma >= 40) {
+            if (this.jugador != null) {
+                this.jugador.setVueltas(this.jugador.getVueltas() + 1);
+                this.jugador.sumarFortuna(Valor.SUMA_VUELTA);
+                System.out.println(this.jugador.getNombre() + " pasa por la Salida y cobra " + (long) Valor.SUMA_VUELTA + "€.");
+            }
+        }
     }
 
     /*Método que permite generar un ID para un avatar. Sólo lo usamos en esta clase (por ello es privado).
