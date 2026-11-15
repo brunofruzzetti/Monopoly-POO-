@@ -18,12 +18,9 @@ public class Casilla {
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private Casilla parking; //referencia para acceder a parking
     private boolean hipotecada; //Esta hipotecada o no una casilla
-<<<<<<< HEAD
     private float dineroAcomulado; //valor de cuanto ha dinero ha generado una casilla
     private int frecuentado; //numero de veces que han pasado por una casilla
-=======
     private ArrayList<Edificio> edificios = new ArrayList<>(); //Edificios construidos en la casilla (si es solar).
->>>>>>> 3b18d0fb6c4ac6665dafff18e83c93be7116c468
 
     //Precios y alquileres de los edificios de un solar (Apéndice I).
     private float precioCasa;
@@ -287,7 +284,7 @@ public class Casilla {
     * - El valor de la tirada: para determinar impuesto a pagar en casillas de servicios.
     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
     * en caso de no cumplirlas.*/
-    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
+    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada, Tablero tablero, ArrayList<Jugador> jugadores) {
         sumarFrecuencia();
         // 1. Casillas comprables (Solar, Transporte, Servicios)
         if (esComprable()) {
@@ -344,7 +341,22 @@ public class Casilla {
             }
             return true;
         }
-        // 4. Suerte, Caja de Comunidad, Salida o Cárcel de visita
+        // 4. Casillas de Suerte o Comunidad
+        if (this.tipo.equalsIgnoreCase("Suerte") && tablero != null) {
+            Carta carta = tablero.sacarCartaSuerte();
+            return carta.accionar(actual, banca, jugadores, tablero);
+        }
+
+        if ((this.tipo.equalsIgnoreCase("Comunidad") || this.nombre.equalsIgnoreCase("Caja")) && tablero != null) {
+            Carta carta = tablero.sacarCartaComunidad();
+            return carta.accionar(actual, banca, jugadores, tablero);
+        }
+        // 5. Salida
+        if(this.posicion - tirada <= 0){
+            actual.sumarFortuna(Valor.SUMA_VUELTA);
+            actual.setVueltas(actual.getVueltas() + 1);
+        }
+        // 6. Cárcel de visita
         return true;
     }  
 

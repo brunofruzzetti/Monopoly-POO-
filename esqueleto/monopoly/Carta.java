@@ -41,8 +41,8 @@ public class Carta {
         switch(id){
             case 1:
                 Casilla destino = tablero.encontrar_casilla("Solar19");
-                moverConPasoPorSalida();
-                return destino.evaluarCasilla(jugador, banca, 0);
+                moverConPasoPorSalida(jugador, destino, tablero);
+                return destino.evaluarCasilla(jugador, banca, 0, tablero, jugadores);
         
             case 2:
                 jugador.encarcelar(tablero.getPosiciones());
@@ -58,7 +58,7 @@ public class Carta {
                 int otros = jugadores. size() - 1;
                 float total = cuota * otros;
                 if (jugador.getFortuna() < total){
-                    System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar a todos (" + (long) total + " de euros.) Debe hipotecar una propiedad.");
+                    System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar a todos (" + (long) total + "€.) Debe hipotecar una propiedad.");
                     return false;
                 }
                 jugador.sumarFortuna(-total);
@@ -68,7 +68,7 @@ public class Carta {
                         j.sumarFortuna(cuota);
                     }
                 }
-                System.out.println(jugador.getNombre() + " paga 250.000 euros a cada jugador");
+                System.out.println(jugador.getNombre() + " paga 250000€ a cada jugador");
                 return true;
             case 5:
                 int posActual = jugador.getAvatar().getLugar().getPosicion();
@@ -76,24 +76,24 @@ public class Carta {
                 if (nuevaPos < 1) {
                     nuevaPos += 40;
                 }
-                Casilla destino = tablero.getCasilla(nuevaPos);
+                Casilla retroceso = tablero.getCasilla(nuevaPos);
                 jugador.getAvatar().getLugar().eliminarAvatar(jugador.getAvatar());
-                jugador.getAvatar().setLugar(destino);
-                destino.anhadirAvatar(jugador.getAvatar());
-                System.out.println(jugador.getNombre() + " retrocede hasta " + destino.getNombre() + ".");
-                return destino.evaluarCasilla(jugador, banca, 0, tablero, jugadores);
+                jugador.getAvatar().setLugar(retroceso);
+                retroceso.anhadirAvatar(jugador.getAvatar());
+                System.out.println(jugador.getNombre() + " retrocede hasta " + retroceso.getNombre() + ".");
+                return retroceso.evaluarCasilla(jugador, banca, 0, tablero, jugadores);
             case 6: 
-                return cobrarOForzarHipoteca();
+                return cobrarOForzarHipoteca(jugador, banca, 150000f, "multa");
             case 7:
-                Casilla transporte = buscarTransporteMasCercano();
-                moverConPasoPorSalida();
+                Casilla transporte = buscarTransporteMasCercano(jugador.getAvatar().getLugar() , tablero);
+                moverConPasoPorSalida(jugador, transporte, tablero);
                 if (transporte.getDuenho() == banca) {
                     System.out.println(transporte.getNombre() + " no tiene dueño. Puedes comprarla si lo deseas.");
                     return true;
                 } else if (transporte.getDuenho() != jugador) {
                     float doble = Valor.ALQUILER_TRANSPORTE * 2.0f;
                     if (jugador.getFortuna() < doble){
-                        System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar el alquiler (" + (long) doble + " euros de alquiler).");
+                        System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar el alquiler (" + (long) doble + "€ de alquiler).");
                         return false;
                     }
                     jugador.sumarGastos(doble);
@@ -108,10 +108,10 @@ public class Carta {
 }
 
     // CARTAS DE CAJA DE COMUNIDAD (1 A 6)
-    private boolean accionarComunidad(Jugador jugador, Jugador banca, Tablero tablero, ArrayList<Jugador> jugadores) {
+    private boolean accionarComunidad(Jugador jugador, Jugador banca, ArrayList<Jugador> jugadores, Tablero tablero) {
         switch (id){
             case 1:
-                return cobrarOForzarHipoteca();
+                return cobrarOForzarHipoteca(jugador, banca, 500000f, "fin de semana en un balneario");
             case 2:
                 jugador.encarcelar(tablero.getPosiciones());
                 System.out.println(jugador.getNombre() + " va directamente a la carcel.");
@@ -121,10 +121,11 @@ public class Carta {
                 jugador.getAvatar().getLugar().eliminarAvatar(jugador.getAvatar());
                 jugador.getAvatar().setLugar(salida);
                 jugador.sumarFortuna(2000000f);
+                return true;
             case 4:
                 jugador.sumarFortuna(500000f);
                 jugador.getEstadisticas().sumarPremios(500000f);
-                System.out.println(jugador.getNombre() + " recibe 500.000€ de Hacienda.");
+                System.out.println(jugador.getNombre() + " recibe 500000€ de Hacienda.");
                 return true;
             case 5:
                 Casilla retrocedo = tablero.encontrar_casilla("Solar1");
@@ -134,9 +135,14 @@ public class Carta {
                 System.out.println(jugador.getNombre() + " retrocede hasta Solar1.");
                 return retrocedo.evaluarCasilla(jugador, banca, 0, tablero, jugadores);
             case 6:
-                cobrarOForzarHipoteca();
+                Casilla solar20 = tablero.encontrar_casilla("Solar20");
+                moverConPasoPorSalida(jugador, solar20, tablero);
+                return solar20.evaluarCasilla(jugador, banca, 0, tablero, jugadores);
+            default:
+                return true;
         }
     }
+
 
     private void moverConPasoPorSalida(Jugador jugador, Casilla destino, Tablero tablero) {
         int posOrigen = jugador.getAvatar().getLugar().getPosicion();
@@ -181,7 +187,14 @@ public class Carta {
 
     private boolean cobrarOForzarHipoteca(Jugador jugador, Jugador banca, float cantidad, String motivo) {
         if (jugador.getFortuna() < cantidad) {
-            System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar " + (long) cantidad + );
+            System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar " + (long) cantidad + "€. Debe hipotecar una propiedad.");
+            return false;
         }
+        jugador.sumarFortuna(-cantidad);
+        jugador.sumarGastos(cantidad);
+        jugador.getEstadisticas().sumarPagoTasasImpuestos(cantidad);
+        banca.sumarFortuna(cantidad);
+        System.out.println(jugador.getNombre() + " paga " + (long) cantidad + "€ por (" + motivo + ").");
+        return true;
     }
 }
