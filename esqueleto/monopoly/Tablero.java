@@ -265,7 +265,7 @@ public class Tablero {
 
     public Carta sacarCartaComunidad() {
         Carta c = cartasComunidad.get(indiceComunidad);
-        indiceComunidad = (indiceSuerte + 1) % 6;
+        indiceComunidad = (indiceComunidad + 1) % 6;
         return c;
     }
 
