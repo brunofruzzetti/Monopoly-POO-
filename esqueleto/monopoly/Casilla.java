@@ -630,6 +630,65 @@ public class Casilla {
     }
 
 
+    public void venderEdificios(String tipoEdificio, int cantidad, Jugador solicitante) {
+        if (!tipo.equalsIgnoreCase("Solar")) {
+            System.out.println("No se puede vender edificios en " + nombre + " porque no es un solar.");
+            return;
+        }
+        if (duenho != solicitante) {
+            System.out.println("No se pueden vender edificios en " + nombre + " porque no pertenece a " + solicitante.getNombre() + ".");
+            return;
+        }
+        if (cantidad <= 0) {
+            System.out.println("La cantidad a vender debe ser mayor que cero.");
+            return;
+        }
+
+        int existentes = contarEdificios(tipoEdificio);
+        if (existentes == 0) {
+            System.out.println("No hay edificios de tipo " + tipoEdificio + " en " + nombre + ".");
+            return;
+        }
+        if (cantidad > existentes) {
+            System.out.println("Solamente se pueden vender " + existentes + " edificios de tipo " + tipoEdificio + " en " + nombre + ".");
+            return;
+        }
+
+        float precioUnitario;
+        switch (tipoEdificio) {
+            case "casa": precioUnitario = precioCasa; break;
+            case "hotel": precioUnitario = precioHotel; break;
+            case "piscina": precioUnitario = precioPiscina; break;
+            case "pista_deporte": precioUnitario = precioPista; break;
+            default:
+                System.out.println("Tipo de edificio incorrecto. Tipos: casa, hotel, piscina, pista_deporte.");
+                return;
+        }
+
+        // Eliminar 'cantidad' edificios de ese tipo tanto de la casilla como del jugador
+        int eliminados = 0;
+        ArrayList<Edificio> aEliminar = new ArrayList<>();
+        for (Edificio e : edificios) {
+            if (e.getTipo().equals(tipoEdificio) && eliminados < cantidad) {
+                aEliminar.add(e);
+                eliminados++;
+            }
+        }
+        for (Edificio e : aEliminar) {
+            edificios.remove(e);
+            solicitante.eliminarEdificio(e);
+        }
+
+        float ganancia = (precioUnitario / 2.0f) * cantidad;
+        solicitante.sumarFortuna(ganancia);
+
+        int restantes = contarEdificios(tipoEdificio);
+        System.out.println(solicitante.getNombre() + " ha vendido " + cantidad + " " + tipoEdificio
+                + (cantidad > 1 ? "s" : "") + " en " + nombre + ", recibiendo " + formato(ganancia)
+                + "€. En la propiedad queda" + (restantes == 1 ? " " : "n ") + restantes + " " + tipoEdificio
+                + (restantes == 1 ? "" : "s") + ".");
+    }
+    
     /*Calcula el alquiler de un solar. Sin edificios, es el alquiler base (el doble si el dueño
      * tiene todo el grupo); con edificios, el alquiler base más el de cada edificio construido.
      */

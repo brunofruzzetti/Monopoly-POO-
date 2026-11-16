@@ -51,7 +51,7 @@ public class Carta {
             case 3:
                 jugador.sumarFortuna(1000000f);
                 jugador.getEstadisticas().sumarPremios(1000000f);
-                System.out.println(jugador.getNombre() + " recibe 1.000.000 de euros.");
+                System.out.println(jugador.getNombre() + " recibe 1000000€.");
                 return true;
             case 4:
                 float cuota = 250000f;
@@ -99,9 +99,10 @@ public class Carta {
                     jugador.sumarGastos(doble);
                     transporte.getDuenho().sumarFortuna(doble);
                     transporte.getDuenho().getEstadisticas().sumarPagoAlquileres(doble);
-                    System.out.println(jugador.getNombre() + " paga " + (long) doble + "euros de alquiler a " + transporte.getDuenho().getNombre() + ".");
+                    System.out.println(jugador.getNombre() + " paga " + (long) doble + "€ de alquiler a " + transporte.getDuenho().getNombre() + ".");
                     return true;
                 }
+                return true;
             default:
                 return true;
     }
@@ -120,7 +121,11 @@ public class Carta {
                 Casilla salida = tablero.encontrar_casilla("Salida");
                 jugador.getAvatar().getLugar().eliminarAvatar(jugador.getAvatar());
                 jugador.getAvatar().setLugar(salida);
-                jugador.sumarFortuna(2000000f);
+                salida.anhadirAvatar(jugador.getAvatar());
+                jugador.sumarFortuna(Valor.SUMA_VUELTA);
+                jugador.setVueltas(jugador.getVueltas() + 1);
+                jugador.getEstadisticas().sumarPasarSalida(Valor.SUMA_VUELTA);
+                System.out.println(jugador.getNombre() + " se coloca en la Salida y cobra 2.000.000€.");
                 return true;
             case 4:
                 jugador.sumarFortuna(500000f);

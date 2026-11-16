@@ -227,6 +227,7 @@ public class Menu {
                 }
                 switch(normalizar(partes[1])){
                     case "jugadores": listarJugadores(); break;
+                    case "avatares": listarAvatares(); break;
                     case "enventa": listarVenta(); break;
                     case "edificios":
                         if(partes.length == 3) listarEdificios(partes[2]);
@@ -378,6 +379,14 @@ public class Menu {
             $> edificar casa
             el jugador edifica en la casilla en la que se encuentra su avatar
             */
+           case "vender":
+                if (partes.length != 4) {
+                    System.out.println("Argumentos incorrectos, uso: $> vender casa|hotel|piscina|pista_deporte nombreCasilla cantidad");
+                    break;
+                }
+                vender(partes[1].toLowerCase(), partes[2], partes[3]);
+                break;
+            
             case "ver":
                 if(partes.length != 2 || !normalizar(partes[1]).equals("tablero")){
                     System.out.println("Argumentos incorrectos, uso: $> ver tablero");
@@ -417,7 +426,6 @@ public class Menu {
                 break;
         }
     }
-
     /*
     Método que realiza las acciones asociadas al comando 'describir jugador'.
     Parámetro: comando introducido
@@ -541,7 +549,7 @@ public class Menu {
         }
         jugadorActual.getAvatar().moverAvatar(tablero.getPosiciones(), d1 + d2); //se mueve el jugador las posiciones de los dados
         Casilla destino = jugadorActual.getAvatar().getLugar();
-        solvente = destino.evaluarCasilla(jugadorActual, banca, d1 + d2); //evaluar la casilla de destino
+        solvente = destino.evaluarCasilla(jugadorActual, banca, d1 + d2, this.tablero, this.jugadores); //evaluar la casilla de destino
         if(!solvente){
             System.out.println(jugadorActual.getNombre() + " debe hipotecar alguna propiedad o declararse en bancarrota.");
         }
@@ -605,6 +613,27 @@ public class Menu {
         }
         Jugador jugadorActual = jugadores.get(turno);
         jugadorActual.getAvatar().getLugar().edificar(tipoEdificio, jugadorActual);
+    }
+
+    private void vender(String tipoEdificio, String nombreCasilla, String cantidadStr) {
+        if (jugadores.isEmpty()) {
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+        int cantidad;
+        try {
+            cantidad = Integer.parseInt(cantidadStr);
+        } catch (NumberFormatException e) {
+            System.out.println("La cantidad debe ser un número entero.");
+            return;
+        }
+        Jugador jugadorActual = jugadores.get(turno);
+        Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
+        if (casilla == null) {
+            System.out.println("No existe la casilla " + nombreCasilla);
+            return;
+        }
+        casilla.venderEdificios(tipoEdificio, cantidad, jugadorActual);
     }
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
@@ -694,7 +723,19 @@ public class Menu {
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
     private void listarAvatares() {
-
+        if (avatares.isEmpty()) {
+            System.out.println("No hay avatares registrados.");
+            return;
+        }
+        for (int i = 0; i < avatares.size(); i++) {
+            Avatar a = avatares.get(i);
+            System.out.println("{\n"
+                    + "\tid: " + a.getId() + ",\n"
+                    + "\ttipo: " + a.getTipo() + ",\n"
+                    + "\tjugador: " + a.getJugador().getNombre() + ",\n"
+                    + "\tcasilla: " + a.getLugar().getNombre() + "\n"
+                    + "}" + (i < avatares.size() - 1 ? "," : ""));
+        }
     }
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
