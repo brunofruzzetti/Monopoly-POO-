@@ -282,6 +282,34 @@ public class Tablero {
         return null;
     }
 
+
+    //Metodo para buscar la casilla mas rentable
+    public Casilla casillaMasRentable() {
+        Casilla mejor = null;
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                if (mejor == null || c.getDineroAcomulado() > mejor.getDineroAcomulado()) {
+                    mejor = c;
+                }
+            }
+        }
+        return mejor;
+    }
+
+
+    //Metodo para buscar la casilla mas frecuentada
+    public Casilla casillaMasFrecuentada() {
+    Casilla frecuentada = null;
+    for (ArrayList<Casilla> lado : posiciones) {
+        for (Casilla c : lado) {
+            if (frecuentada == null || c.getFrecuentado() > frecuentada.getFrecuentado()) {
+                frecuentada = c;
+            }
+        }
+    }
+    return frecuentada;
+}
+
     private static String normalizar(String texto) {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
     }

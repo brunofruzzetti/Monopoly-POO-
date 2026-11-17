@@ -780,7 +780,42 @@ public class Menu {
 
     // Método que realiza las acciones de 'estadisticas'
     private void estadisticas(){
-        
+        if(jugadores.isEmpty()){
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+        Casilla rentable = tablero.casillaMasRentable();
+        Casilla frecuentado = tablero.casillaMasFrecuentada();
+        String grupoRentable = tablero.grupoMasRentable();   // método nuevo en Tablero: devuelve el nombre del grupo, o null
+
+        Jugador vueltas = null;
+        Jugador cabeza = null;
+        float mayorPatrimonio = -1;
+        for(Jugador a : jugadores){
+            if(vueltas == null || a.getVueltas() > vueltas.getVueltas()){
+                vueltas = a;
+            }
+            float patrimonio = a.getFortuna();
+            for(Casilla c : a.getPropiedades()){
+                patrimonio += c.getValor();
+                // + valor de los edificios de la casilla (cuando estén implementados)
+            }
+            if(patrimonio > mayorPatrimonio){
+                mayorPatrimonio = patrimonio;
+                cabeza = a;
+            }
+        }
+
+        String nombreRentable = (rentable == null || rentable.getDineroAcomulado() == 0) ? "-" : rentable.getNombre();
+        String nombreFrecuentado = (frecuentado == null || frecuentado.getFrecuentado() == 0) ? "-" : frecuentado.getNombre();
+        String nombreGrupo = (grupoRentable == null) ? "-" : grupoRentable;
+
+        System.out.println("{\n\tcasillaMasRentable: " + nombreRentable
+                + ",\n\tgrupoMasRentable: " + nombreGrupo
+                + ",\n\tcasillaMasFrecuentada: " + nombreFrecuentado
+                + ",\n\tjugadorMasVueltas: " + vueltas.getNombre()
+                + ",\n\tjugadorEnCabeza: " + cabeza.getNombre()
+                + "\n}");
     }
 
     // Método que realiza las acciones de 'estadisticas <jugador>'

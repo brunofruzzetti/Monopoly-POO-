@@ -105,7 +105,7 @@ public class Grupo {
         return true;
     }
 
-    public float dineroAcomuladoGrupo(){
+    public float grupoMasRentable(){
         float salida = 0;
         for(Casilla c : miembros){
             salida += c.getDineroAcomulado();
