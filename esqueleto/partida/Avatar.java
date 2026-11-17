@@ -86,6 +86,7 @@ public class Avatar {
             if (this.jugador != null) {
                 this.jugador.setVueltas(this.jugador.getVueltas() + 1);
                 this.jugador.sumarFortuna(Valor.SUMA_VUELTA);
+                this.jugador.getEstadisticas().sumarPasarSalida(Valor.SUMA_VUELTA);
                 System.out.println(this.jugador.getNombre() + " pasa por la Salida y cobra " + (long) Valor.SUMA_VUELTA + "€.");
             }
         }

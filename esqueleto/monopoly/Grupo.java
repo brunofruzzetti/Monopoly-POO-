@@ -105,13 +105,7 @@ public class Grupo {
         return true;
     }
 
-    public float grupoMasRentable(){
-        float salida = 0;
-        for(Casilla c : miembros){
-            salida += c.getDineroAcomulado();
-        }
-        return salida;
-    }
+
     /*Devuelve los edificios de cada casilla del grupo y, al final, qué se puede construir todavía
      * según los límites del grupo (N edificios de cada tipo, siendo N el número de solares; 4 casas
      * por solar, o N casas en el grupo cuando ya hay N hoteles).
@@ -177,6 +171,13 @@ public class Grupo {
             n += c.contarEdificios(tipoEdificio);
         }
         return n;
+    }
+
+    public boolean hayHipotecas() {
+        for (Casilla c : miembros) {
+            if (c.getHipotecada()) return true;
+        }
+        return false;
     }
 
 }

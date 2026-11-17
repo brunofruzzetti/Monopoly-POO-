@@ -111,7 +111,7 @@ public class Tablero {
         ArrayList<Casilla> lado = new ArrayList<>();
         lado.add(new Casilla("Cárcel", "Especial", 11, banca));
         lado.add(crearSolar("Solar6", 12, 1400000, 700000, 1000000, 1000000, 200000, 400000, 100000, 1500000, 7500000, 1500000, 1500000));
-        lado.add(new Casilla("Srv1", "Servicios", 13, Valor.PRECIO_SERVICIO, banca));
+        lado.add(new Casilla("Serv1", "Servicios", 13, Valor.PRECIO_SERVICIO, banca));
         lado.add(crearSolar("Solar7", 14, 1400000, 700000, 1000000, 1000000, 200000, 400000, 100000, 1500000, 7500000, 1500000, 1500000));
         lado.add(crearSolar("Solar8", 15, 1600000, 800000, 1000000, 1000000, 200000, 400000, 120000, 1750000, 9000000, 1800000, 1800000));
         lado.add(new Casilla("Trans2", "Transporte", 16, Valor.PRECIO_TRANSPORTE, banca));
@@ -239,7 +239,7 @@ public class Tablero {
         this.cartasComunidad = new ArrayList<>();
 
         // Cartas de Suerte(1 a 7)
-        cartasSuerte.add(new Carta(1, "Suerte", "Decides hacer un viaje de placer. Avanza hasta Solar19. Si pasas por Salida, cobras"));
+        cartasSuerte.add(new Carta(1, "Suerte", "Decides hacer un viaje de placer. Avanza hasta Solar19. Si pasas por Salida, cobras 2000000€."));
         cartasSuerte.add(new Carta(2, "Suerte", "Los acreedores te persiguen por impago. Ve a la Cárcel. Ve directamente sin pasar por la casilla de Salida y sin cobrar los 2000000€."));
         cartasSuerte.add(new Carta(3, "Suerte", "¡Has ganado el bote de la lotería! Recibe 1000000€."));
         cartasSuerte.add(new Carta(4, "Suerte", "Has sido elegido presidente de la junta directiva. Paga a cada jugador 250000€."));
@@ -299,17 +299,42 @@ public class Tablero {
 
     //Metodo para buscar la casilla mas frecuentada
     public Casilla casillaMasFrecuentada() {
-    Casilla frecuentada = null;
-    for (ArrayList<Casilla> lado : posiciones) {
-        for (Casilla c : lado) {
-            if (frecuentada == null || c.getFrecuentado() > frecuentada.getFrecuentado()) {
-                frecuentada = c;
+        Casilla frecuentada = null;
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                if (frecuentada == null || c.getFrecuentado() > frecuentada.getFrecuentado()) {
+                    frecuentada = c;
+                }
             }
         }
+        return frecuentada;
     }
-    return frecuentada;
-}
 
+    //Devuelve el nombre del grupo cuyas casillas han cobrado más alquiler, o null si ninguno ha cobrado nada.
+    public String grupoMasRentable() {
+        HashMap<String, Float> total = new HashMap<>();
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                if (c.getGrupo() != null) {   // solo los solares pertenecen a un grupo
+                    String nombreGrupo = c.getGrupo().getColorGrupo();
+                    float acumulado = total.getOrDefault(nombreGrupo, 0f);
+                    total.put(nombreGrupo, acumulado + c.getDineroAcomulado());
+                }
+            }
+        }
+        String mejor = null;
+        float mayor = 0;
+        for (String nombreGrupo : total.keySet()) {
+            if (total.get(nombreGrupo) > mayor) {
+                mayor = total.get(nombreGrupo);
+                mejor = nombreGrupo;
+            }
+        }
+        return mejor;
+    }
+
+
+    
     private static String normalizar(String texto) {
         return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase();
     }

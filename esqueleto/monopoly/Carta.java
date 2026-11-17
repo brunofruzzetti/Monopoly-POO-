@@ -61,7 +61,6 @@ public class Carta {
                     System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar a todos (" + (long) total + "€.) Debe hipotecar una propiedad.");
                     return false;
                 }
-                jugador.sumarFortuna(-total);
                 jugador.sumarGastos(total);
                 for (Jugador j : jugadores) {
                     if (j != jugador) {
@@ -83,7 +82,7 @@ public class Carta {
                 System.out.println(jugador.getNombre() + " retrocede hasta " + retroceso.getNombre() + ".");
                 return retroceso.evaluarCasilla(jugador, banca, 0, tablero, jugadores);
             case 6: 
-                return cobrarOForzarHipoteca(jugador, banca, 150000f, "multa");
+                return cobrarOForzarHipoteca(jugador, tablero, 150000f, "multa");
             case 7:
                 Casilla transporte = buscarTransporteMasCercano(jugador.getAvatar().getLugar() , tablero);
                 moverConPasoPorSalida(jugador, transporte, tablero);
@@ -93,12 +92,15 @@ public class Carta {
                 } else if (transporte.getDuenho() != jugador) {
                     float doble = Valor.ALQUILER_TRANSPORTE * 2.0f;
                     if (jugador.getFortuna() < doble){
+                        jugador.setDeuda(doble, transporte.getDuenho());
                         System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar el alquiler (" + (long) doble + "€ de alquiler).");
                         return false;
                     }
                     jugador.sumarGastos(doble);
                     transporte.getDuenho().sumarFortuna(doble);
-                    transporte.getDuenho().getEstadisticas().sumarPagoAlquileres(doble);
+                    jugador.getEstadisticas().sumarPagoAlquileres(doble);
+                    transporte.getDuenho().getEstadisticas().sumarCobroAlquileres(doble);
+                    transporte.sumarDineroAcomulado(doble);
                     System.out.println(jugador.getNombre() + " paga " + (long) doble + "€ de alquiler a " + transporte.getDuenho().getNombre() + ".");
                     return true;
                 }
@@ -112,7 +114,7 @@ public class Carta {
     private boolean accionarComunidad(Jugador jugador, Jugador banca, ArrayList<Jugador> jugadores, Tablero tablero) {
         switch (id){
             case 1:
-                return cobrarOForzarHipoteca(jugador, banca, 500000f, "fin de semana en un balneario");
+                return cobrarOForzarHipoteca(jugador, tablero, 500000f, "fin de semana en un balneario");
             case 2:
                 jugador.encarcelar(tablero.getPosiciones());
                 System.out.println(jugador.getNombre() + " va directamente a la carcel.");
@@ -190,16 +192,16 @@ public class Carta {
         return tablero.getCasilla(targetPos);
     }
 
-    private boolean cobrarOForzarHipoteca(Jugador jugador, Jugador banca, float cantidad, String motivo) {
+    private boolean cobrarOForzarHipoteca(Jugador jugador, Tablero tablero, float cantidad, String motivo) {
         if (jugador.getFortuna() < cantidad) {
+            jugador.setDeuda(cantidad, null);
             System.out.println(jugador.getNombre() + " no tiene suficiente dinero para pagar " + (long) cantidad + "€. Debe hipotecar una propiedad.");
             return false;
         }
-        jugador.sumarFortuna(-cantidad);
         jugador.sumarGastos(cantidad);
         jugador.getEstadisticas().sumarPagoTasasImpuestos(cantidad);
-        banca.sumarFortuna(cantidad);
-        System.out.println(jugador.getNombre() + " paga " + (long) cantidad + "€ por (" + motivo + ").");
+        tablero.encontrar_casilla("Parking").sumarValor(cantidad);
+        System.out.println(jugador.getNombre() + " paga " + (long) cantidad + "€ por " + motivo + ".");
         return true;
     }
 }

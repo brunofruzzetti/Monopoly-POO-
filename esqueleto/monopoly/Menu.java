@@ -368,23 +368,24 @@ public class Menu {
                 }
                 deshipotecar(partes[1]);
                 break;
+
             case "edificar":
                 if(partes.length != 2){
                     System.out.println("Argumentos incorrectos, uso: $> edificar casa|hotel|piscina|pista_deporte");
                     break;
                 }
-                edificar(partes[1].toLowerCase());
+                edificar(partes[1]);
                 break;
             /*
             $> edificar casa
             el jugador edifica en la casilla en la que se encuentra su avatar
             */
-           case "vender":
+            case "vender":
                 if (partes.length != 4) {
                     System.out.println("Argumentos incorrectos, uso: $> vender casa|hotel|piscina|pista_deporte nombreCasilla cantidad");
                     break;
                 }
-                vender(partes[1].toLowerCase(), partes[2], partes[3]);
+                vender(partes[1], partes[2], partes[3]);
                 break;
             
             case "ver":
@@ -405,7 +406,7 @@ public class Menu {
                     estadisticasJugador(partes);
                     break;
                 }
-                System.out.println("Argumentos incorrectos, uso: $> estadistidas <jugador>");
+                System.out.println("Argumentos incorrectos, uso: $> estadisticas <jugador>");
                 break;
             /*
             $> estadisticas
@@ -480,7 +481,7 @@ public class Menu {
         lanzarDados(d1, d2);
     }
     
-    private void lanzarDados(int d1, int d2){ //de forma forzosa
+        private void lanzarDados(int d1, int d2){ //de forma forzosa
         //comprobaciones
         if(jugadores.size() < 2){
             System.out.println("Se necesitan al menos 2 jugadores para jugar");
@@ -509,11 +510,12 @@ public class Menu {
                 jugadorActual.setTiradasCarcel(jugadorActual.getTiradasCarcel() + 1);
                 if(jugadorActual.getTiradasCarcel() == 3){
                     if(jugadorActual.getFortuna() < Valor.PRECIO_SALIR_CARCEL){
-                        solvente = false; //debe declarse en bancarota no implementado
+                        solvente = false; //debe declararse en bancarrota (no implementado)
                         System.out.println(jugadorActual.getNombre() + " no puede pagar y debe declararse en bancarrota.");
                         return;
                     }
                     jugadorActual.sumarGastos(Valor.PRECIO_SALIR_CARCEL);
+                    jugadorActual.getEstadisticas().sumarPagoTasasImpuestos(Valor.PRECIO_SALIR_CARCEL);
                     jugadorActual.setEnCarcel(false);
                     jugadorActual.setTiradasCarcel(0);
                     System.out.println(jugadorActual.getNombre() + " paga 500.000€ y sale de la carcel.");
@@ -555,11 +557,12 @@ public class Menu {
         }
         if(destino.getNombre().equalsIgnoreCase("IrCarcel")){ //cae en la casilla IrCarcel
             jugadorActual.encarcelar(tablero.getPosiciones());
-            tirado = true;
-            lanzamientos = 0;
             System.out.println("El avatar se coloca en la casilla de Cárcel.");
         }
-
+        if(jugadorActual.getEnCarcel()){ //encarcelado por la casilla IrCarcel o por una carta
+            tirado = true;
+            lanzamientos = 0;
+        }
     }
 
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
@@ -579,22 +582,53 @@ public class Menu {
         casilla.comprarCasilla(jugadorActual, banca);
     }
 
+    //Si el jugador tiene una deuda y ya puede pagarla, la salda y vuelve a ser solvente.
+    private void intentarSaldarDeuda(Jugador j) {
+        if (solvente || j.getDeuda() <= 0) return;
+        if (j.getFortuna() < j.getDeuda()) {
+            System.out.println(j.getNombre() + " aún debe " + (long) j.getDeuda() + "€. Debe hipotecar o vender más.");
+            return;
+        }
+        float d = j.getDeuda();
+        j.sumarGastos(d);
+        if (j.getAcreedor() != null) {
+            j.getAcreedor().sumarFortuna(d);
+            j.getEstadisticas().sumarPagoAlquileres(d);
+            j.getAcreedor().getEstadisticas().sumarCobroAlquileres(d);
+            System.out.println(j.getNombre() + " salda su deuda de " + (long) d + "€ con " + j.getAcreedor().getNombre() + ".");
+        } else {
+            tablero.encontrar_casilla("Parking").sumarValor(d);
+            j.getEstadisticas().sumarPagoTasasImpuestos(d);
+            System.out.println(j.getNombre() + " salda su deuda de " + (long) d + "€ con el Parking.");
+        }
+        j.limpiarDeuda();
+        solvente = true;
+    }
     /*Método que ejecuta todas las acciones realizadas con el comando 'hipotecar nombre_casilla'.
     * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
-    private void hipotecar(String nombreCasilla) {
-    Jugador jugadorActual = jugadores.get(turno);
-    Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
-    if (casilla == null) {
-        System.out.println("La casilla " + nombreCasilla + " no existe.");
-        return;
+     private void hipotecar(String nombreCasilla) {
+        if (jugadores.isEmpty()) {
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
+        Jugador jugadorActual = jugadores.get(turno);
+        Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
+        if (casilla == null) {
+            System.out.println("La casilla " + nombreCasilla + " no existe.");
+            return;
+        }
+        casilla.hipotecarCasilla(jugadorActual);
+        intentarSaldarDeuda(jugadorActual);
     }
-    casilla.hipotecarCasilla(jugadorActual);
-}
     /*Método que ejecuta todas las acciones realizadas con el comando 'deshipotecar nombre_casilla'.
     * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
     private void deshipotecar(String nombreCasilla) {
+        if (jugadores.isEmpty()) {
+            System.out.println("No hay jugadores registrados");
+            return;
+        }
         Jugador jugadorActual = jugadores.get(turno);
         Casilla casilla = this.tablero.encontrar_casilla(nombreCasilla);
         if (casilla == null) {
@@ -603,6 +637,7 @@ public class Menu {
         }
         casilla.deshipotecarCasilla(jugadorActual);
     }
+
     /*Método que ejecuta todas las acciones realizadas con el comando 'edificar tipo_edificio'.
     * Se edifica en la casilla en la que se encuentra el avatar del jugador que tiene el turno.
      */
@@ -611,13 +646,35 @@ public class Menu {
             System.out.println("No hay jugadores registrados");
             return;
         }
+        String tipo = tipoEdificioNormalizado(tipoEdificio);
+        if(tipo == null){
+            System.out.println("Tipo de edificio incorrecto. Tipos: casa, hotel, piscina, pista_deporte.");
+            return;
+        }
         Jugador jugadorActual = jugadores.get(turno);
-        jugadorActual.getAvatar().getLugar().edificar(tipoEdificio, jugadorActual);
+        jugadorActual.getAvatar().getLugar().edificar(tipo, jugadorActual);
     }
+
+    //Convierte "casa", "casas", "hoteles"... al tipo con el que se guardan los edificios. Devuelve null si no existe.
+    private String tipoEdificioNormalizado(String t) {
+        switch (normalizar(t)) {
+            case "casa": case "casas": return "casa";
+            case "hotel": case "hoteles": return "hotel";
+            case "piscina": case "piscinas": return "piscina";
+            case "pista_deporte": case "pistas_deporte": case "pista": case "pistas": return "pista_deporte";
+            default: return null;
+        }
+    }
+
 
     private void vender(String tipoEdificio, String nombreCasilla, String cantidadStr) {
         if (jugadores.isEmpty()) {
             System.out.println("No hay jugadores registrados");
+            return;
+        }
+        String tipo = tipoEdificioNormalizado(tipoEdificio);
+        if (tipo == null) {
+            System.out.println("Tipo de edificio incorrecto. Tipos: casa, hotel, piscina, pista_deporte.");
             return;
         }
         int cantidad;
@@ -633,7 +690,8 @@ public class Menu {
             System.out.println("No existe la casilla " + nombreCasilla);
             return;
         }
-        casilla.venderEdificios(tipoEdificio, cantidad, jugadorActual);
+        casilla.venderEdificios(tipo, cantidad, jugadorActual);
+        intentarSaldarDeuda(jugadorActual);
     }
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel' pagando la cantidad de 500.000€. 
@@ -689,6 +747,9 @@ public class Menu {
     }
 
     private void listarVenta() {
+        if(banca.getPropiedades().isEmpty()){ System.out.println("No hay propiedades en venta.");
+            return; 
+        }
         ArrayList<Casilla> enVenta = banca.getPropiedades();
         for(int i = 0; i < enVenta.size(); i++){
             System.out.println(enVenta.get(i).casEnVenta() + (i < enVenta.size() - 1 ? "," : ""));
@@ -798,7 +859,9 @@ public class Menu {
             float patrimonio = a.getFortuna();
             for(Casilla c : a.getPropiedades()){
                 patrimonio += c.getValor();
-                // + valor de los edificios de la casilla (cuando estén implementados)
+            }
+            for(Edificio e : a.getEdificios()){
+                patrimonio += e.getCoste();
             }
             if(patrimonio > mayorPatrimonio){
                 mayorPatrimonio = patrimonio;

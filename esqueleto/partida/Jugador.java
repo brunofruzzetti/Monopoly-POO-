@@ -19,6 +19,9 @@ public class Jugador {
     private Estadisticas estadisticas = new Estadisticas();
     private ArrayList<Casilla> hipotecas; // propiedades hipotecadas que posee el jugador.
     private ArrayList<Edificio> edificios = new ArrayList<>(); //Edificios construidos por el jugador.
+    private float deuda;
+    private Jugador acreedor; //null = la deuda es con el bote del Parking
+
 
     //getters
     public String getNombre() { return nombre; }
@@ -32,6 +35,8 @@ public class Jugador {
     public Estadisticas getEstadisticas(){ return estadisticas; }
     public ArrayList<Casilla> getHipotecas(){ return hipotecas; }
     public ArrayList<Edificio> getEdificios(){ return edificios; }
+    public float getDeuda(){ return deuda; }
+    public Jugador getAcreedor(){ return acreedor; }
 
     //setters
     public void setNombre(String nombre){
@@ -61,8 +66,10 @@ public class Jugador {
     public void setHipotecas(ArrayList<Casilla> hipotecas){
         this.hipotecas = hipotecas;
     }
-
-
+    public void setDeuda(float deuda, Jugador acreedor){
+        this.deuda = deuda;
+        this.acreedor = acreedor;
+    }
 
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
@@ -142,7 +149,6 @@ public class Jugador {
     //Parámetro: valor a añadir a los gastos del jugador (será el precio de un solar, impuestos pagados...).
     public void sumarGastos(float valor) {
         this.fortuna -= valor;
-        this.estadisticas.sumarDineroInvertido(valor);
         this.gastos += valor;
     }
 
@@ -151,7 +157,7 @@ public class Jugador {
     public void encarcelar(ArrayList<ArrayList<Casilla>> pos) {
         this.enCarcel = true;
         this.tiradasCarcel = 0;
-        this.estadisticas.sumarVecesCarcel(estadisticas.getVecesCarcel() + 1);
+        this.estadisticas.sumarVecesCarcel(1);
         // La Cárcel es la primera casilla del lado oeste (índice 1, posición 0)
         // La Cárcel es la posición 11 (índice 0 del lado Oeste: pos.get(1).get(0))
         Casilla carcel = pos.get(1).get(0);
@@ -181,13 +187,21 @@ public class Jugador {
             }
             props += "]";
         }
-
         String salida = "{\n";
         salida = salida + "  nombre: " + this.nombre + ",\n";
         salida = salida + "  avatar: " + idAvatar + ",\n";
         salida = salida + "  fortuna: " + String.format("%.0f", this.fortuna) + ",\n";
         salida = salida + "  propiedades: " + props + "\n";
-        salida = salida + "  hipotecas: -\n";
+        String hips = "-";
+        if (!this.hipotecas.isEmpty()) {
+            hips = "[";
+            for (int i = 0; i < this.hipotecas.size(); i++) {
+                if (i > 0) hips += ", ";
+                hips += this.hipotecas.get(i).getNombre();
+            }
+            hips += "]";
+        }
+        salida = salida + "  hipotecas: " + hips + "\n";
         String edifs = "-";
         if (!this.edificios.isEmpty()) {
             edifs = "[";
@@ -200,6 +214,11 @@ public class Jugador {
         salida = salida + "  edificios: " + edifs + "\n";
         salida = salida + "}";
         return salida;
+    }
+
+    public void limpiarDeuda(){
+        this.deuda = 0;
+        this.acreedor = null;
     }
     @Override
     public String toString() {

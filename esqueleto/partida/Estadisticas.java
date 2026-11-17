@@ -14,8 +14,8 @@ public class Estadisticas {
     public float getDineroInvertido(){ return dineroInvertido; }
     public float getPagoTasasImpuestos(){ return pagoTasasImpuestos; }
     public float getPagoAlquileres(){ return pagoAlquileres; }
-    public float getcobroAlquileres(){ return cobroAlquileres; }
-    public float getpasarSalida(){ return pasarSalida; }
+    public float getCobroAlquileres(){ return cobroAlquileres; }
+    public float getPasarSalida(){ return pasarSalida; }
     public float getPremios(){ return premios; }
     public int getVecesCarcel(){ return vecesCarcel; }
     public int getVueltas(){ return vueltas; }
@@ -42,6 +42,9 @@ public class Estadisticas {
     public void sumarVueltas(int vueltas){
         this.vueltas += vueltas;
     }
+    public void sumarCobroAlquileres(float cobroAlquileres){
+        this.cobroAlquileres += cobroAlquileres;
+    }
 
     public Estadisticas(){
         dineroInvertido = 0;
@@ -56,14 +59,14 @@ public class Estadisticas {
 
     @Override
     public String toString(){
-        String salida = "{\n";
-        salida += "  dineroInvertido: " + dineroInvertido + "\n";
-        salida += "  pagoTasasEImpuestos: " + pagoTasasImpuestos + "\n";
-        salida += "  pagoDeAlquileres: " + pagoAlquileres + "\n";
-        salida += "  cobroDeAlquileres: " + cobroAlquileres + "\n";
-        salida += "  pasarPorCasillaDeSalida: " + pasarSalida + "\n";
-        salida += "  premiosInversionesOBote: " + premios + "\n";
-        salida += "  vecesEnLaCarcel: " + vecesCarcel + "\n}";
-        return salida;
+        return "{\n"
+                + "  dineroInvertido: " + (long) dineroInvertido + ",\n"
+                + "  pagoTasasEImpuestos: " + (long) pagoTasasImpuestos + ",\n"
+                + "  pagoDeAlquileres: " + (long) pagoAlquileres + ",\n"
+                + "  cobroDeAlquileres: " + (long) cobroAlquileres + ",\n"
+                + "  pasarPorCasillaDeSalida: " + (long) pasarSalida + ",\n"
+                + "  premiosInversionesOBote: " + (long) premios + ",\n"
+                + "  vecesEnLaCarcel: " + vecesCarcel + "\n"
+                + "}";
     }
 }
