@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 import partida.*;
 
-public class Menu {
+public class Juego {
 
     //Atributos
     private ArrayList<Jugador> jugadores; //Jugadores de la partida.
@@ -94,7 +94,7 @@ public class Menu {
     }
 
     //Constructor vacío.
-    public Menu() {
+    public Juego() {
         iniciarPartida();
     }
 

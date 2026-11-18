@@ -1,7 +1,10 @@
-package monopoly;
+package partida;
 
-import partida.*;
 import java.util.ArrayList;
+
+import monopoly.Casilla;
+import monopoly.Tablero;
+import monopoly.Valor;
 
 public class Carta {
     private int id;
